@@ -2,7 +2,11 @@
 
 > **已脱敏**：本仓库隐藏 GMV 金额、商品 ID、广告计划 ID。曝光 / 点击 / 访客 / 询盘 / 商机 / 订单 / 渠道结构等指标的相对关系保持真实，用于演示"如何用数据判断投放好坏"的分析框架。
 
-在线预览：**https://mawenjian51-byte.github.io/alibaba-ads-dashboard-demo/**
+在线预览（GitHub Pages，首次需在 Settings → Pages 选择 `main` / `/(root)` 启用）：
+**https://mawenjian51-byte.github.io/alibaba-ads-dashboard-demo/**
+
+立即可用（第三方渲染代理，无需设置）：
+https://htmlpreview.github.io/?https://github.com/mawenjian51-byte/alibaba-ads-dashboard-demo/blob/main/index.html
 
 数据窗口：2026-08-12 ~ 2026-11-08（89 个自然日），生成于 2026-11-10。
 
@@ -36,3 +40,4 @@
 - 访客 / 询盘人数 / TM 咨询人数为上游**日去重**人数，跨日相加不等于区间去重，页面标「日累计」。
 - 商品参谋为搜索口径单日明细（快照日各链接搜索曝光合计与店铺当日搜索曝光一致，已对账）。
 - 上游仅返回 126 个链接（店铺有效商品 274 个）；访客明细接口在部分区间覆盖不可用，国家维度采用买家分布接口。
+
