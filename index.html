@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>直通车投放与店铺经营数据大屏 · Navicat</title>
+<style>
+:root{
+  --bg:#070b14; --bg2:#0b1220; --card:#0e1727; --card2:#111d30;
+  --line:#1c2c45; --line2:#24395a;
+  --txt:#e8eef8; --dim:#8fa3bf; --dim2:#63799a;
+  --cyan:#22d3ee; --blue:#3b82f6; --violet:#8b5cf6;
+  --green:#34d399; --amber:#fbbf24; --red:#f87171; --pink:#f472b6;
+  --shadow:0 18px 50px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:
+    radial-gradient(1200px 600px at 12% -10%, rgba(34,211,238,.10), transparent 60%),
+    radial-gradient(1000px 500px at 88% 0%, rgba(139,92,246,.10), transparent 55%),
+    var(--bg);
+  color:var(--txt);
+  font-family:"Segoe UI","PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
+  font-size:14px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1560px;margin:0 auto;padding:0 22px 80px}
+.mono{font-family:"JetBrains Mono","SF Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+
+/* ---------- header ---------- */
+.top{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+  background:linear-gradient(180deg,rgba(7,11,20,.96),rgba(7,11,20,.86));
+  border-bottom:1px solid var(--line);}
+.top-in{max-width:1560px;margin:0 auto;padding:14px 22px 12px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:12px;min-width:260px}
+.logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--cyan),var(--blue) 55%,var(--violet));
+  display:grid;place-items:center;font-weight:800;color:#04121c;font-size:15px;box-shadow:0 6px 18px rgba(34,211,238,.35)}
+.brand h1{font-size:16px;margin:0;font-weight:700;letter-spacing:.3px}
+.brand p{margin:1px 0 0;font-size:11.5px;color:var(--dim2);letter-spacing:.2px}
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.presets{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px}
+.presets button{background:transparent;border:0;color:var(--dim);font-size:12px;padding:5px 11px;border-radius:7px;cursor:pointer;font-family:inherit}
+.presets button:hover{color:var(--txt);background:rgba(34,211,238,.09)}
+.presets button.on{background:linear-gradient(135deg,rgba(34,211,238,.22),rgba(59,130,246,.22));color:#a5f3fc;box-shadow:inset 0 0 0 1px rgba(34,211,238,.35)}
+.dfield{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:5px 10px}
+.dfield label{font-size:11px;color:var(--dim2);white-space:nowrap}
+.dfield input[type=date]{background:transparent;border:0;color:var(--txt);font-family:inherit;font-size:12.5px;outline:none;color-scheme:dark}
+.dfield input[type=date]::-webkit-calendar-picker-indicator{filter:invert(.7);cursor:pointer}
+.rangechip{font-size:11.5px;color:#a5f3fc;background:rgba(34,211,238,.10);border:1px solid rgba(34,211,238,.28);
+  padding:5px 10px;border-radius:8px;white-space:nowrap}
+
+/* ---------- layout ---------- */
+section{margin-top:26px;scroll-margin-top:92px}
+.sec-h{display:flex;align-items:baseline;gap:12px;margin:0 0 12px;flex-wrap:wrap}
+.sec-h h2{font-size:15px;margin:0;font-weight:700;letter-spacing:.4px;display:flex;align-items:center;gap:9px}
+.sec-h h2::before{content:"";width:3px;height:15px;border-radius:2px;background:linear-gradient(180deg,var(--cyan),var(--blue))}
+.sec-h .sub{font-size:11.5px;color:var(--dim2)}
+.grid{display:grid;gap:12px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g23{grid-template-columns:2fr 1fr}
+.g13{grid-template-columns:1fr 2fr}
+
+.card{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:14px;padding:14px 16px;position:relative;overflow:hidden}
+.card::after{content:"";position:absolute;inset:0 0 auto 0;height:1px;background:linear-gradient(90deg,transparent,rgba(34,211,238,.35),transparent)}
+.card h3{margin:0 0 10px;font-size:12.5px;font-weight:600;color:var(--dim);letter-spacing:.4px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.card h3 .tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;background:rgba(59,130,246,.16);color:#93c5fd;letter-spacing:.2px}
+
+/* KPI */
+.kpi{display:flex;flex-direction:column;gap:3px;padding:15px 16px 14px}
+.kpi .k{font-size:11.5px;color:var(--dim2);letter-spacing:.3px;display:flex;align-items:center;gap:5px}
+.kpi .v{font-size:26px;font-weight:750;letter-spacing:-.4px;line-height:1.15}
+.kpi .u{font-size:12px;color:var(--dim);font-weight:500;margin-left:3px}
+.kpi .n{font-size:11px;color:var(--dim2)}
+.kpi .n b{color:var(--dim)}
+
+.c-cyan{color:var(--cyan)}.c-blue{color:#7dabff}.c-green{color:var(--green)}
+.c-amber{color:var(--amber)}.c-red{color:var(--red)}.c-violet{color:#b79cff}.c-pink{color:var(--pink)}
+.badge{font-size:10px;padding:2px 7px;border-radius:5px;font-weight:700;letter-spacing:.4px;display:inline-block}
+.b-ok{background:rgba(52,211,153,.16);color:#6ee7b7}
+.b-warn{background:rgba(251,191,36,.16);color:#fcd34d}
+.b-bad{background:rgba(248,113,113,.16);color:#fca5a5}
+.b-idle{background:rgba(143,163,191,.14);color:#a8bcd8}
+
+/* tables */
+.tbl-wrap{overflow:auto;max-height:520px;border-radius:10px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+thead th{position:sticky;top:0;z-index:2;background:#0c1524;color:var(--dim);font-weight:600;font-size:11.5px;
+  text-align:right;padding:9px 10px;border-bottom:1px solid var(--line2);white-space:nowrap;letter-spacing:.2px;cursor:pointer;user-select:none}
+thead th:first-child,tbody td:first-child{text-align:left}
+thead th:hover{color:var(--cyan)}
+thead th.sorted{color:var(--cyan)}
+tbody td{padding:8px 10px;border-bottom:1px solid rgba(28,44,69,.55);text-align:right;white-space:nowrap;color:#d7e3f4}
+tbody tr:hover td{background:rgba(34,211,238,.045)}
+tbody td.l{text-align:left}
+.pname{max-width:420px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;color:#dbe7f7}
+.pid{font-size:10.5px;color:var(--dim2)}
+.zero{color:#4d6180}
+.empty{padding:22px;text-align:center;color:var(--dim2);font-size:12.5px}
+
+/* charts */
+.chart-host{width:100%;overflow:visible}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.axis text{fill:#5e7494;font-size:10px}
+.gridline{stroke:rgba(36,57,90,.6);stroke-width:1}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--dim);margin-top:6px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle}
+
+/* bars */
+.hrow{display:grid;grid-template-columns:96px 1fr 74px 62px;gap:9px;align-items:center;padding:5px 0;font-size:12px}
+.hrow .nm{color:#c9d8ec;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hrow .track{display:block;height:7px;background:rgba(36,57,90,.55);border-radius:4px;overflow:hidden}
+.hrow .fill{display:block;height:7px;border-radius:4px;background:linear-gradient(90deg,var(--cyan),var(--blue))}
+.hrow .val{text-align:right;color:var(--txt);font-weight:600}
+.hrow .sub{text-align:right;color:var(--dim2);font-size:11px}
+
+/* notice */
+.notice{border-radius:12px;padding:13px 15px;font-size:12.5px;display:flex;gap:11px;align-items:flex-start;line-height:1.6}
+.notice.warn{background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.28);color:#f3d489}
+.notice.bad{background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.28);color:#f6b1b1}
+.notice.info{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.25);color:#a9c8f7}
+.notice b{color:#fff}
+.notice .ic{font-size:15px;line-height:1.2}
+
+/* product vs ad compare */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.vs .card.hl{border-color:rgba(34,211,238,.35);box-shadow:inset 0 0 0 1px rgba(34,211,238,.10)}
+.kv{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px dashed rgba(36,57,90,.6);font-size:12.5px}
+.kv:last-child{border-bottom:0}
+.kv span{color:var(--dim)}
+.kv b{font-weight:650}
+
+/* framework table */
+.fw{width:100%;font-size:12.5px;border-collapse:separate;border-spacing:0;table-layout:fixed}
+.fw td{overflow-wrap:anywhere;white-space:normal}
+.fw.fwe td.q{width:20%}
+.fw.fwe td.q{width:24%}
+.fw th{text-align:left;font-size:11px;color:var(--dim2);font-weight:600;padding:9px 12px;background:#0c1524;border-bottom:1px solid var(--line2);white-space:nowrap}
+.fw td{padding:10px 12px;border-bottom:1px solid rgba(28,44,69,.55);vertical-align:top;color:#d3e0f2;line-height:1.6}
+.fw td.q{color:#fff;font-weight:600;width:15%}
+.fw td.m{color:#a9c8f7;width:23%}
+.fw td.s{color:#f3d489;width:27%}
+.fw tr:hover td{background:rgba(34,211,238,.04)}
+
+.fwgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.fwi{background:linear-gradient(180deg,var(--card),var(--card2));border:1px solid var(--line);border-radius:12px;padding:13px 15px}
+.fwi .qt{font-size:13px;font-weight:700;color:#fff;margin-bottom:9px;display:flex;gap:8px;align-items:baseline}
+.fwi .qt i{font-style:normal;font-size:10px;color:#0b1220;background:linear-gradient(135deg,var(--cyan),var(--blue));border-radius:5px;padding:1px 6px;font-weight:800;flex:none}
+.fwi .ln{font-size:12px;line-height:1.65;color:#a9bcd6;padding:4px 0;border-top:1px dashed rgba(36,57,90,.55)}
+.fwi .ln b{color:#7dabff;font-weight:600;margin-right:6px}
+.fwi .res{margin-top:8px;padding-top:8px;border-top:1px solid rgba(36,57,90,.8)}
+@media(max-width:1100px){.fwgrid{grid-template-columns:1fr}}
+.pill{font-size:10.5px;padding:1px 7px;border-radius:20px;border:1px solid;display:inline-block;margin:1px 3px 1px 0}
+.pill.g{color:#6ee7b7;border-color:rgba(52,211,153,.35);background:rgba(52,211,153,.08)}
+.pill.w{color:#fcd34d;border-color:rgba(251,191,36,.35);background:rgba(251,191,36,.08)}
+.pill.r{color:#fca5a5;border-color:rgba(248,113,113,.35);background:rgba(248,113,113,.08)}
+.pill.n{color:#a8bcd8;border-color:rgba(143,163,191,.3);background:rgba(143,163,191,.08)}
+
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.toolbar input[type=search],.toolbar select{background:var(--card);border:1px solid var(--line);color:var(--txt);
+  border-radius:9px;padding:7px 11px;font-family:inherit;font-size:12.5px;outline:none;min-width:180px}
+.toolbar input[type=search]:focus,.toolbar select:focus{border-color:rgba(34,211,238,.5)}
+.toolbar .cnt{font-size:11.5px;color:var(--dim2);margin-left:auto}
+.foot{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);color:var(--dim2);font-size:11.5px;line-height:1.8}
+.foot b{color:var(--dim)}
+.foot code{background:rgba(36,57,90,.5);padding:1px 5px;border-radius:4px;font-size:11px;color:#a9c8f7}
+@media(max-width:1180px){.g4{grid-template-columns:repeat(2,1fr)}.g23,.g13{grid-template-columns:1fr}}
+@media(max-width:760px){.g3,.g2,.vs{grid-template-columns:1fr}.kpi .v{font-size:22px}.pname{max-width:200px}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="top-in">
+    <div class="brand">
+      <div class="logo">NV</div>
+      <div>
+        <h1>直通车投放 &amp; 店铺经营数据大屏</h1>
+        <p id="store-line">Navicat · Alibaba.com</p>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="presets" id="presets">
+        <button data-days="7">近7天</button>
+        <button data-days="14">近14天</button>
+        <button data-days="30">近30天</button>
+        <button data-days="0" class="on">全部</button>
+      </div>
+      <div class="dfield">
+        <label>范围</label>
+        <input type="date" id="d-start">
+        <span style="color:#3d5170">→</span>
+        <input type="date" id="d-end">
+      </div>
+      <div class="dfield">
+        <label>单日</label>
+        <input type="date" id="d-one">
+      </div>
+      <div class="rangechip mono" id="range-chip">—</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ============ 1. 总览 ============ -->
+  <section id="s-overview">
+    <div class="sec-h">
+      <h2>数据概览（总）</h2>
+      <span class="sub" id="ov-sub">—</span>
+    </div>
+    <div class="grid g4" id="kpi-grid"></div>
+    <div class="grid g2" style="margin-top:12px">
+      <div class="card">
+        <h3>每日访客与点击 <span class="tag" id="trend-tag">区间</span></h3>
+        <div class="chart-host" id="chart-trend"></div>
+        <div class="legend">
+          <span><i style="background:#22d3ee"></i>访客人数（左轴）</span>
+          <span><i style="background:#8b5cf6"></i>总点击（右轴）</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>漏斗转化（区间累计）</h3>
+        <div id="funnel"></div>
+      </div>
+    </div>
+    <div class="notice info" style="margin-top:12px">
+      <span class="ic">i</span>
+      <div><b>人数类口径：</b>访客人数、询盘人数、TM 咨询人数为上游<b>日去重</b>人数，跨日相加不等于区间去重人数，页面标注为「日累计」。
+      区间整体转化率请以下方「区间权威口径」为准（数据地图自定义日期返回原值），不要用日级数据反推。</div>
+    </div>
+  </section>
+
+  <!-- ============ 2. 直通车 ============ -->
+  <section id="s-p4p">
+    <div class="sec-h">
+      <h2>直通车投放状态（全站推 / 标准推）</h2>
+      <span class="sub">广告账户实时数据（workctl 广告接口）</span>
+    </div>
+    <div id="p4p-alert"></div>
+    <div class="vs" style="margin-top:12px">
+      <div class="card hl">
+        <h3>全站推 <span class="tag" id="ws-tag">—</span></h3>
+        <div id="ws-body"></div>
+      </div>
+      <div class="card">
+        <h3>标准推（直通车关键词） <span class="tag" id="sr-tag">—</span></h3>
+        <div id="sr-body"></div>
+      </div>
+    </div>
+    <div class="grid g2" style="margin-top:12px">
+      <div class="card">
+        <h3>全站推计划 <span class="tag">共 4 个</span></h3>
+        <div class="tbl-wrap" style="max-height:280px">
+          <table><thead><tr><th>计划</th><th>状态</th><th>预算</th><th>在线商品</th></tr></thead>
+          <tbody id="ws-plans"></tbody></table>
+        </div>
+      </div>
+      <div class="card">
+        <h3>标准推在投计划 <span class="tag" id="sr-plan-count">—</span></h3>
+        <div class="tbl-wrap" style="max-height:280px">
+          <table><thead><tr><th>计划</th><th>状态</th><th>预算</th><th>在线商品</th></tr></thead>
+          <tbody id="sr-plans"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 3. 按周消耗与转化 ============ -->
+  <section id="s-week">
+    <div class="sec-h">
+      <h2>按周消耗与转化</h2>
+      <span class="sub">自然周（周一→周日），区间内首尾周可能不完整</span>
+    </div>
+    <div class="grid g23">
+      <div class="card">
+        <h3>周度消耗 / 商机 / 点击 <span class="tag">消耗单位 ¥</span></h3>
+        <div class="chart-host" id="chart-week"></div>
+        <div class="legend">
+          <span><i style="background:#3b82f6"></i>总点击</span>
+          <span><i style="background:#34d399"></i>商机量</span>
+          <span style="color:#f87171">广告消耗恒为 ¥0（图中红色基线）</span>
+        </div>
+      </div>
+      <div class="card">
+        <h3>周度明细</h3>
+        <div class="tbl-wrap" style="max-height:400px">
+          <table>
+            <thead><tr><th>周区间</th><th>消耗¥</th><th>曝光</th><th>点击</th><th>询盘</th><th>商机</th><th>订单</th><th>GMV$</th></tr></thead>
+            <tbody id="week-rows"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 4. 流量参谋 ============ -->
+  <section id="s-traffic">
+    <div class="sec-h">
+      <h2>流量参谋 · 流量来源渠道</h2>
+      <span class="sub">搜索 / 推荐 / 榜单 / 店内 / 直接访问 / 站外 / 其他</span>
+    </div>
+    <div class="grid g13">
+      <div class="card">
+        <h3>渠道访客占比 <span class="tag">日累计</span></h3>
+        <div class="chart-host" id="chart-pie"></div>
+        <div id="pie-legend" class="legend" style="flex-direction:column;gap:6px"></div>
+      </div>
+      <div class="card">
+        <h3>渠道明细 <span class="tag" id="ch-count">—</span></h3>
+        <div class="tbl-wrap" style="max-height:430px">
+          <table>
+            <thead><tr><th>渠道</th><th>访客</th><th>占比</th><th>TM访客</th><th>询盘访客</th><th>询盘+TM/访客</th><th>有数天数</th></tr></thead>
+            <tbody id="ch-rows"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:10px;font-size:11.5px;color:var(--dim2)">
+          「其他」= 会场 / 信保 / 询盘 / 站内收藏 等上游次级渠道合并；鼠标悬停行可看原始拆分。渠道访客按各渠道分别计数，同一访客可能命中多个渠道，<b>合计可大于店铺访客数</b>。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 5. 商品参谋 ============ -->
+  <section id="s-product">
+    <div class="sec-h">
+      <h2>商品参谋 · 每个链接在全店的表现</h2>
+      <span class="sub" id="pp-sub">—</span>
+    </div>
+    <div class="notice info" style="margin-bottom:10px">
+      <span class="ic">✓</span>
+      <div><b>口径已对账：</b>快照日各链接「搜索曝光」合计 <b>371</b>、「搜索点击」合计 <b>7</b>，与店铺当日搜索曝光 371 / 搜索点击 7 <b>完全一致</b>，可确认是搜索口径的单日明细。
+      「30 天商机」为上游 <code>abCnt30d</code> 字段（38 个链接有值，合计 87），与「商机」日字段不同，不要混用；上游仅返回 126 个链接（店铺有效商品 274 个），未返回的链接没有明细。</div>
+    </div>
+    <div class="card">
+      <div class="toolbar">
+        <input type="search" id="pp-search" placeholder="搜索商品名称 / ID">
+        <select id="pp-stage"><option value="">全部层级</option></select>
+        <select id="pp-sort">
+          <option value="leads">按30天商机排序</option>
+          <option value="imp">按搜索曝光排序</option>
+          <option value="clk">按搜索点击排序</option>
+          <option value="vis">按访客排序</option>
+          <option value="inq">按询盘排序</option>
+          <option value="gmv">按GMV排序</option>
+          <option value="ctr">按点击率排序</option>
+        </select>
+        <span class="cnt" id="pp-cnt">—</span>
+      </div>
+      <div class="tbl-wrap" style="max-height:560px">
+        <table>
+          <thead><tr>
+            <th>商品</th><th>层级</th><th>搜索曝光</th><th>搜索点击</th><th>点击率</th><th>访客</th>
+            <th>询盘</th><th>30天商机</th><th>订单</th><th>GMV$</th>
+            <th>直通车曝光</th><th>直通车点击</th><th>直通车花费¥</th>
+          </tr></thead>
+          <tbody id="pp-rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6. 优品/爆品 ============ -->
+  <section id="s-structure">
+    <div class="sec-h">
+      <h2>商品结构 · 优品 / 爆品数量</h2>
+      <span class="sub" id="layer-sub">—</span>
+    </div>
+    <div class="grid g23">
+      <div class="card">
+        <h3>分层数量与质量贡献 <span class="tag">快照</span></h3>
+        <div class="tbl-wrap" style="max-height:none">
+          <table>
+            <thead><tr><th>层级</th><th>商品数</th><th>占比</th><th>平均访客(快照)</th><th>平均30天商机</th></tr></thead>
+            <tbody id="layer-rows"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <h3>优爆品结构 <span class="tag">数量</span></h3>
+        <div id="layer-kpi"></div>
+        <div class="chart-host" id="chart-layer" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 7. 国家 / 欧美 ============ -->
+  <section id="s-country">
+    <div class="sec-h">
+      <h2>市场分布 · 欧美买家数据</h2>
+      <span class="sub">买家分布接口，近 90 天累计（该面板固定口径，不随日期选择器变化）</span>
+    </div>
+    <div class="grid g3" id="region-cards"></div>
+    <div class="grid g2" style="margin-top:12px">
+      <div class="card">
+        <h3>欧美主要国家（按访客）</h3>
+        <div id="eu-bars"></div>
+      </div>
+      <div class="card">
+        <h3>国家 Top 20 <span class="tag">访客 / 曝光 / 商机</span></h3>
+        <div class="tbl-wrap" style="max-height:420px">
+          <table><thead><tr><th>国家/地区</th><th>访客</th><th>商品曝光</th><th>商机量</th><th>商机/访客</th></tr></thead>
+          <tbody id="ctry-rows"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 8. 运营判断框架 ============ -->
+  <section id="s-framework">
+    <div class="sec-h">
+      <h2>运营该看哪些数据判断投放好坏</h2>
+      <span class="sub">判断逻辑 + 本店实测值（结论基于本次已查证据）</span>
+    </div>
+    <div class="fwgrid" id="fw-rows"></div>
+    <div class="grid g2" style="margin-top:12px">
+      <div class="card">
+        <h3>建议动作（按优先级）</h3>
+        <div id="actions"></div>
+      </div>
+      <div class="card">
+        <h3>全站推 vs 标准推：数据能看到什么</h3>
+        <table class="fw fwe">
+          <thead><tr><th>维度</th><th>全站推（AI）</th><th>标准推（关键词）</th></tr></thead>
+          <tbody id="vs-rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<script>
+const DATA = {"meta":{"store":"Shenzhen Navicat Technology Co., Limited","start":"2026-08-12","end":"2026-11-08","days":89,"snapshotDate":"2026-11-08","generatedAt":"2026-11-10","currency":"USD","public":true,"sanitized":["gmv","product_id","campaign_id"],"sanitizedAt":"2026-11-10"},"daily":[{"d":"2026-08-12","vis":18,"exp":891,"clk":17,"sexp":384,"sclk":6,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":5,"leads":5,"ords":0,"gmv":null,"v2l":0.0555,"r5":0.3744,"replySec":174,"good":11,"top":0,"valid":284},{"d":"2026-08-13","vis":16,"exp":785,"clk":20,"sexp":249,"sclk":4,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":6,"leads":6,"ords":0,"gmv":null,"v2l":0.25,"r5":0.3857,"replySec":181.2,"good":12,"top":0,"valid":284},{"d":"2026-08-14","vis":12,"exp":844,"clk":14,"sexp":287,"sclk":3,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":3,"leads":3,"ords":1,"gmv":null,"v2l":0,"r5":0.3946,"replySec":175.8,"good":12,"top":0,"valid":284},{"d":"2026-08-15","vis":4,"exp":714,"clk":8,"sexp":221,"sclk":1,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":1,"inqB":1,"tmB":2,"leads":2,"ords":0,"gmv":null,"v2l":0.25,"r5":0.3955,"replySec":175.8,"good":12,"top":0,"valid":283},{"d":"2026-08-16","vis":19,"exp":866,"clk":24,"sexp":243,"sclk":6,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":4,"leads":4,"ords":0,"gmv":null,"v2l":0.0526,"r5":0.4009,"replySec":171,"good":12,"top":0,"valid":282},{"d":"2026-08-17","vis":13,"exp":842,"clk":22,"sexp":276,"sclk":9,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":7,"leads":8,"ords":1,"gmv":null,"v2l":0.0769,"r5":0.4037,"replySec":164.4,"good":12,"top":0,"valid":282},{"d":"2026-08-18","vis":21,"exp":1010,"clk":25,"sexp":337,"sclk":11,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":8,"leads":8,"ords":0,"gmv":null,"v2l":0.238,"r5":0.4036,"replySec":162,"good":12,"top":0,"valid":282},{"d":"2026-08-19","vis":17,"exp":881,"clk":17,"sexp":313,"sclk":4,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":6,"leads":6,"ords":3,"gmv":null,"v2l":0.1764,"r5":0.3982,"replySec":160.2,"good":12,"top":0,"valid":282},{"d":"2026-08-20","vis":16,"exp":880,"clk":18,"sexp":281,"sclk":4,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":9,"leads":9,"ords":0,"gmv":null,"v2l":0.3125,"r5":0.3877,"replySec":159.60000000000002,"good":12,"top":0,"valid":282},{"d":"2026-08-21","vis":16,"exp":1000,"clk":36,"sexp":271,"sclk":3,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":3,"inqB":2,"tmB":10,"leads":10,"ords":1,"gmv":null,"v2l":0.1875,"r5":0.3956,"replySec":159.60000000000002,"good":11,"top":0,"valid":282},{"d":"2026-08-22","vis":14,"exp":721,"clk":14,"sexp":287,"sclk":5,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":5,"leads":5,"ords":0,"gmv":null,"v2l":0.2857,"r5":0.4115,"replySec":158.4,"good":11,"top":0,"valid":282},{"d":"2026-08-23","vis":11,"exp":485,"clk":9,"sexp":281,"sclk":5,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":7,"leads":7,"ords":1,"gmv":null,"v2l":0.1818,"r5":0.422,"replySec":163.20000000000002,"good":11,"top":0,"valid":281},{"d":"2026-08-24","vis":10,"exp":495,"clk":8,"sexp":303,"sclk":3,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":10,"leads":10,"ords":0,"gmv":null,"v2l":0.1,"r5":0.4009,"replySec":171.6,"good":10,"top":0,"valid":281},{"d":"2026-08-25","vis":12,"exp":483,"clk":11,"sexp":270,"sclk":6,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":1,"inqB":1,"tmB":10,"leads":11,"ords":0,"gmv":null,"v2l":0.3333,"r5":0.4,"replySec":163.8,"good":10,"top":0,"valid":281},{"d":"2026-08-26","vis":11,"exp":484,"clk":6,"sexp":339,"sclk":2,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":7,"leads":7,"ords":1,"gmv":null,"v2l":0.0909,"r5":0.3864,"replySec":165.6,"good":10,"top":0,"valid":281},{"d":"2026-08-27","vis":4,"exp":414,"clk":7,"sexp":281,"sclk":3,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":5,"leads":5,"ords":0,"gmv":null,"v2l":0.25,"r5":0.3864,"replySec":163.20000000000002,"good":10,"top":0,"valid":281},{"d":"2026-08-28","vis":11,"exp":312,"clk":7,"sexp":224,"sclk":6,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":4,"leads":4,"ords":0,"gmv":null,"v2l":0.0909,"r5":0.3825,"replySec":165,"good":9,"top":0,"valid":281},{"d":"2026-08-29","vis":10,"exp":367,"clk":9,"sexp":238,"sclk":2,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":4,"leads":4,"ords":0,"gmv":null,"v2l":0.1,"r5":0.3756,"replySec":168.6,"good":10,"top":0,"valid":281},{"d":"2026-08-30","vis":4,"exp":349,"clk":4,"sexp":274,"sclk":2,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":3,"leads":3,"ords":0,"gmv":null,"v2l":0.25,"r5":0.3662,"replySec":172.79999999999998,"good":10,"top":0,"valid":281},{"d":"2026-08-31","vis":8,"exp":291,"clk":9,"sexp":190,"sclk":4,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":5,"leads":5,"ords":0,"gmv":null,"v2l":0,"r5":0.3571,"replySec":180.6,"good":10,"top":0,"valid":281},{"d":"2026-09-01","vis":3,"exp":357,"clk":2,"sexp":257,"sclk":2,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":4,"leads":4,"ords":1,"gmv":null,"v2l":0,"r5":0.3654,"replySec":174,"good":10,"top":0,"valid":281},{"d":"2026-09-02","vis":6,"exp":343,"clk":3,"sexp":271,"sclk":2,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":6,"leads":6,"ords":0,"gmv":null,"v2l":0,"r5":0.3582,"replySec":172.79999999999998,"good":9,"top":0,"valid":281},{"d":"2026-09-03","vis":4,"exp":285,"clk":8,"sexp":206,"sclk":7,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":2,"leads":2,"ords":0,"gmv":null,"v2l":0.25,"r5":0.375,"replySec":162.6,"good":7,"top":0,"valid":281},{"d":"2026-09-04","vis":5,"exp":302,"clk":6,"sexp":189,"sclk":4,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":2,"leads":2,"ords":0,"gmv":null,"v2l":0,"r5":0.3846,"replySec":153.6,"good":7,"top":0,"valid":281},{"d":"2026-09-05","vis":6,"exp":254,"clk":7,"sexp":177,"sclk":6,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":1,"leads":1,"ords":0,"gmv":null,"v2l":0,"r5":0.367,"replySec":148.20000000000002,"good":7,"top":0,"valid":281},{"d":"2026-09-06","vis":5,"exp":386,"clk":9,"sexp":311,"sclk":3,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":3,"leads":3,"ords":0,"gmv":null,"v2l":0.2,"r5":0.3641,"replySec":142.20000000000002,"good":6,"top":0,"valid":281},{"d":"2026-09-07","vis":14,"exp":566,"clk":10,"sexp":296,"sclk":4,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":4,"leads":4,"ords":0,"gmv":null,"v2l":0,"r5":0.3693,"replySec":144.60000000000002,"good":6,"top":0,"valid":281},{"d":"2026-09-08","vis":20,"exp":986,"clk":34,"sexp":300,"sclk":4,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":3,"leads":3,"ords":1,"gmv":null,"v2l":0,"r5":0.3657,"replySec":145.8,"good":5,"top":0,"valid":281},{"d":"2026-09-09","vis":18,"exp":1040,"clk":32,"sexp":352,"sclk":11,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":3,"leads":3,"ords":0,"gmv":null,"v2l":0.0555,"r5":0.3779,"replySec":142.79999999999998,"good":5,"top":0,"valid":281},{"d":"2026-09-10","vis":22,"exp":1086,"clk":37,"sexp":381,"sclk":13,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":3,"leads":3,"ords":0,"gmv":null,"v2l":0.0454,"r5":0.3975,"replySec":135,"good":6,"top":0,"valid":281},{"d":"2026-09-11","vis":9,"exp":755,"clk":14,"sexp":322,"sclk":2,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":2,"leads":2,"ords":0,"gmv":null,"v2l":0,"r5":0.4079,"replySec":138.6,"good":6,"top":0,"valid":281},{"d":"2026-09-12","vis":17,"exp":627,"clk":21,"sexp":237,"sclk":6,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":1,"leads":1,"ords":0,"gmv":null,"v2l":0.0588,"r5":0.4094,"replySec":131.4,"good":6,"top":0,"valid":281},{"d":"2026-09-13","vis":14,"exp":1238,"clk":25,"sexp":310,"sclk":4,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":5,"leads":5,"ords":0,"gmv":null,"v2l":0.1428,"r5":0.4,"replySec":136.79999999999998,"good":6,"top":0,"valid":281},{"d":"2026-09-14","vis":16,"exp":1418,"clk":32,"sexp":402,"sclk":3,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":1,"inqB":1,"tmB":4,"leads":5,"ords":1,"gmv":null,"v2l":0.125,"r5":0.4014,"replySec":137.4,"good":6,"top":0,"valid":281},{"d":"2026-09-15","vis":13,"exp":877,"clk":17,"sexp":325,"sclk":5,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":1,"inqB":1,"tmB":3,"leads":4,"ords":0,"gmv":null,"v2l":0.0769,"r5":0.4067,"replySec":135.6,"good":6,"top":0,"valid":281},{"d":"2026-09-16","vis":18,"exp":1040,"clk":18,"sexp":237,"sclk":6,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":2,"leads":2,"ords":1,"gmv":null,"v2l":0.1111,"r5":0.42,"replySec":133.20000000000002,"good":4,"top":0,"valid":281},{"d":"2026-09-17","vis":13,"exp":1141,"clk":30,"sexp":334,"sclk":5,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":2,"inqB":1,"tmB":3,"leads":5,"ords":0,"gmv":null,"v2l":0.0769,"r5":0.4276,"replySec":132.6,"good":4,"top":0,"valid":281},{"d":"2026-09-18","vis":20,"exp":953,"clk":21,"sexp":298,"sclk":11,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":2,"leads":2,"ords":1,"gmv":null,"v2l":0,"r5":0.4468,"replySec":122.4,"good":4,"top":0,"valid":281},{"d":"2026-09-19","vis":8,"exp":987,"clk":11,"sexp":235,"sclk":3,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":0,"leads":0,"ords":0,"gmv":null,"v2l":0,"r5":0.4706,"replySec":113.39999999999999,"good":4,"top":0,"valid":281},{"d":"2026-09-20","vis":16,"exp":1049,"clk":29,"sexp":316,"sclk":7,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":2,"leads":2,"ords":0,"gmv":null,"v2l":0.0625,"r5":0.4646,"replySec":117,"good":4,"top":0,"valid":281},{"d":"2026-09-21","vis":9,"exp":1016,"clk":20,"sexp":335,"sclk":2,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":4,"leads":4,"ords":0,"gmv":null,"v2l":0.1111,"r5":0.437,"replySec":122.4,"good":4,"top":0,"valid":280},{"d":"2026-09-22","vis":11,"exp":1011,"clk":23,"sexp":364,"sclk":8,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":4,"leads":4,"ords":0,"gmv":null,"v2l":0.0909,"r5":0.4153,"replySec":125.39999999999999,"good":4,"top":0,"valid":280},{"d":"2026-09-23","vis":18,"exp":921,"clk":24,"sexp":326,"sclk":3,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":2,"inqB":2,"tmB":4,"leads":5,"ords":0,"gmv":null,"v2l":0.1666,"r5":0.4348,"replySec":118.8,"good":3,"top":0,"valid":280},{"d":"2026-09-24","vis":21,"exp":1244,"clk":38,"sexp":316,"sclk":8,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":4,"leads":4,"ords":0,"gmv":null,"v2l":0.0476,"r5":0.4636,"replySec":115.8,"good":3,"top":0,"valid":280},{"d":"2026-09-25","vis":17,"exp":1181,"clk":23,"sexp":342,"sclk":5,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":1,"inqB":1,"tmB":6,"leads":8,"ords":0,"gmv":null,"v2l":0.1176,"r5":0.466,"replySec":117,"good":3,"top":0,"valid":280},{"d":"2026-09-26","vis":17,"exp":1158,"clk":29,"sexp":314,"sclk":8,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":4,"leads":4,"ords":0,"gmv":null,"v2l":0.1176,"r5":0.5049,"replySec":107.4,"good":3,"top":0,"valid":280},{"d":"2026-09-27","vis":20,"exp":1350,"clk":40,"sexp":288,"sclk":6,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":7,"leads":7,"ords":1,"gmv":null,"v2l":0,"r5":0.4902,"replySec":112.2,"good":3,"top":0,"valid":280},{"d":"2026-09-28","vis":14,"exp":1214,"clk":22,"sexp":363,"sclk":4,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":7,"leads":7,"ords":0,"gmv":null,"v2l":0.0714,"r5":0.4857,"replySec":112.2,"good":3,"top":0,"valid":280},{"d":"2026-09-29","vis":19,"exp":1151,"clk":29,"sexp":434,"sclk":9,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":1,"inqB":1,"tmB":4,"leads":4,"ords":0,"gmv":null,"v2l":0.1052,"r5":0.4815,"replySec":111.60000000000001,"good":3,"top":0,"valid":280},{"d":"2026-09-30","vis":20,"exp":1156,"clk":26,"sexp":406,"sclk":11,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":1,"inqB":1,"tmB":4,"leads":4,"ords":0,"gmv":null,"v2l":0,"r5":0.4954,"replySec":100.19999999999999,"good":3,"top":0,"valid":280},{"d":"2026-10-01","vis":22,"exp":1493,"clk":39,"sexp":446,"sclk":5,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":1,"inqB":1,"tmB":5,"leads":5,"ords":0,"gmv":null,"v2l":0.0454,"r5":0.4722,"replySec":103.8,"good":3,"top":0,"valid":280},{"d":"2026-10-02","vis":18,"exp":1010,"clk":29,"sexp":301,"sclk":5,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":2,"leads":2,"ords":0,"gmv":null,"v2l":0.0555,"r5":0.4862,"replySec":98.39999999999999,"good":3,"top":0,"valid":280},{"d":"2026-10-03","vis":15,"exp":991,"clk":30,"sexp":308,"sclk":5,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":3,"leads":3,"ords":0,"gmv":null,"v2l":0.0666,"r5":0.4952,"replySec":100.19999999999999,"good":4,"top":0,"valid":280},{"d":"2026-10-04","vis":24,"exp":1533,"clk":51,"sexp":475,"sclk":14,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":2,"inqB":2,"tmB":3,"leads":6,"ords":1,"gmv":null,"v2l":0.0416,"r5":0.5,"replySec":90,"good":4,"top":0,"valid":280},{"d":"2026-10-05","vis":26,"exp":1509,"clk":34,"sexp":375,"sclk":11,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":5,"leads":5,"ords":1,"gmv":null,"v2l":0.0769,"r5":0.5,"replySec":108,"good":4,"top":0,"valid":280},{"d":"2026-10-06","vis":14,"exp":1316,"clk":27,"sexp":360,"sclk":4,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":3,"leads":3,"ords":0,"gmv":null,"v2l":0.0714,"r5":0.4825,"replySec":144,"good":4,"top":0,"valid":280},{"d":"2026-10-07","vis":28,"exp":1100,"clk":38,"sexp":353,"sclk":17,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":3,"leads":3,"ords":0,"gmv":null,"v2l":0.0357,"r5":0.4649,"replySec":170.39999999999998,"good":4,"top":0,"valid":280},{"d":"2026-10-08","vis":20,"exp":1502,"clk":37,"sexp":395,"sclk":5,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":6,"leads":6,"ords":0,"gmv":null,"v2l":0.05,"r5":0.4602,"replySec":164.4,"good":4,"top":0,"valid":280},{"d":"2026-10-09","vis":18,"exp":1114,"clk":22,"sexp":333,"sclk":9,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":4,"leads":4,"ords":0,"gmv":null,"v2l":0.0555,"r5":0.4569,"replySec":163.8,"good":4,"top":0,"valid":280},{"d":"2026-10-10","vis":18,"exp":1062,"clk":27,"sexp":275,"sclk":5,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":2,"inqB":2,"tmB":3,"leads":5,"ords":1,"gmv":null,"v2l":0.1111,"r5":0.4615,"replySec":174.60000000000002,"good":4,"top":0,"valid":280},{"d":"2026-10-11","vis":20,"exp":1153,"clk":38,"sexp":450,"sclk":17,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":9,"leads":9,"ords":0,"gmv":null,"v2l":0.25,"r5":0.4538,"replySec":177.6,"good":4,"top":0,"valid":280},{"d":"2026-10-12","vis":17,"exp":1264,"clk":34,"sexp":269,"sclk":3,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":9,"leads":9,"ords":2,"gmv":null,"v2l":0.2352,"r5":0.4683,"replySec":178.8,"good":4,"top":0,"valid":279},{"d":"2026-10-13","vis":23,"exp":937,"clk":33,"sexp":322,"sclk":12,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":9,"leads":9,"ords":0,"gmv":null,"v2l":0.1739,"r5":0.4701,"replySec":179.4,"good":4,"top":0,"valid":276},{"d":"2026-10-14","vis":13,"exp":509,"clk":9,"sexp":386,"sclk":5,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":8,"leads":8,"ords":0,"gmv":null,"v2l":0.3076,"r5":0.471,"replySec":190.2,"good":4,"top":0,"valid":276},{"d":"2026-10-15","vis":14,"exp":612,"clk":12,"sexp":415,"sclk":6,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":7,"leads":7,"ords":0,"gmv":null,"v2l":0.2857,"r5":0.461,"replySec":186.6,"good":4,"top":0,"valid":276},{"d":"2026-10-16","vis":14,"exp":571,"clk":9,"sexp":367,"sclk":8,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":1,"inqB":1,"tmB":10,"leads":10,"ords":0,"gmv":null,"v2l":0.2142,"r5":0.4444,"replySec":195.6,"good":4,"top":0,"valid":276},{"d":"2026-10-17","vis":16,"exp":466,"clk":15,"sexp":258,"sclk":10,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":8,"leads":8,"ords":0,"gmv":null,"v2l":0.1875,"r5":0.4539,"replySec":195.6,"good":4,"top":0,"valid":276},{"d":"2026-10-18","vis":16,"exp":688,"clk":21,"sexp":260,"sclk":4,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":2,"inqB":2,"tmB":6,"leads":7,"ords":0,"gmv":null,"v2l":0.125,"r5":0.4359,"replySec":202.79999999999998,"good":4,"top":0,"valid":276},{"d":"2026-10-19","vis":10,"exp":438,"clk":6,"sexp":305,"sclk":2,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":7,"leads":7,"ords":1,"gmv":null,"v2l":0.1,"r5":0.4286,"replySec":205.2,"good":4,"top":0,"valid":276},{"d":"2026-10-20","vis":13,"exp":405,"clk":12,"sexp":292,"sclk":7,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":8,"leads":8,"ords":1,"gmv":null,"v2l":0.1538,"r5":0.4107,"replySec":203.4,"good":4,"top":0,"valid":276},{"d":"2026-10-21","vis":8,"exp":474,"clk":9,"sexp":309,"sclk":3,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":4,"leads":4,"ords":0,"gmv":null,"v2l":0.125,"r5":0.4138,"replySec":202.79999999999998,"good":4,"top":0,"valid":276},{"d":"2026-10-22","vis":10,"exp":395,"clk":6,"sexp":290,"sclk":4,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":5,"leads":5,"ords":0,"gmv":null,"v2l":0.1,"r5":0.4138,"replySec":202.20000000000002,"good":3,"top":0,"valid":276},{"d":"2026-10-23","vis":14,"exp":404,"clk":12,"sexp":276,"sclk":7,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":3,"leads":3,"ords":0,"gmv":null,"v2l":0.1428,"r5":0.4114,"replySec":208.20000000000002,"good":3,"top":0,"valid":276},{"d":"2026-10-24","vis":10,"exp":321,"clk":6,"sexp":259,"sclk":6,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":2,"leads":2,"ords":0,"gmv":null,"v2l":0.1,"r5":0.4104,"replySec":219,"good":3,"top":0,"valid":276},{"d":"2026-10-25","vis":8,"exp":430,"clk":12,"sexp":215,"sclk":3,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":3,"leads":3,"ords":0,"gmv":null,"v2l":0.125,"r5":0.4094,"replySec":223.8,"good":3,"top":0,"valid":275},{"d":"2026-10-26","vis":11,"exp":287,"clk":7,"sexp":201,"sclk":4,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":5,"leads":5,"ords":1,"gmv":null,"v2l":0,"r5":0.3952,"replySec":242.4,"good":3,"top":0,"valid":275},{"d":"2026-10-27","vis":9,"exp":386,"clk":4,"sexp":269,"sclk":0,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":7,"leads":7,"ords":1,"gmv":null,"v2l":0.2222,"r5":0.3869,"replySec":246.60000000000002,"good":3,"top":0,"valid":275},{"d":"2026-10-28","vis":8,"exp":453,"clk":8,"sexp":295,"sclk":8,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":1,"inqB":1,"tmB":8,"leads":8,"ords":0,"gmv":null,"v2l":0.125,"r5":0.3869,"replySec":261.6,"good":3,"top":0,"valid":275},{"d":"2026-10-29","vis":12,"exp":1058,"clk":26,"sexp":324,"sclk":8,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":3,"leads":3,"ords":0,"gmv":null,"v2l":0,"r5":0.4024,"replySec":257.4,"good":3,"top":0,"valid":275},{"d":"2026-10-30","vis":23,"exp":1480,"clk":38,"sexp":495,"sclk":12,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":1,"inqB":1,"tmB":4,"leads":4,"ords":0,"gmv":null,"v2l":0.0434,"r5":0.4107,"replySec":255.6,"good":3,"top":0,"valid":274},{"d":"2026-10-31","vis":16,"exp":1556,"clk":28,"sexp":367,"sclk":7,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":1,"leads":1,"ords":0,"gmv":null,"v2l":0,"r5":0.4107,"replySec":255,"good":4,"top":0,"valid":274},{"d":"2026-11-01","vis":24,"exp":1871,"clk":40,"sexp":425,"sclk":5,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":6,"leads":6,"ords":0,"gmv":null,"v2l":0.125,"r5":0.4024,"replySec":268.2,"good":4,"top":0,"valid":274},{"d":"2026-11-02","vis":31,"exp":1563,"clk":52,"sexp":418,"sclk":13,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":1,"inqB":1,"tmB":8,"leads":9,"ords":0,"gmv":null,"v2l":0.0967,"r5":0.4072,"replySec":265.2,"good":4,"top":0,"valid":274},{"d":"2026-11-03","vis":10,"exp":1087,"clk":17,"sexp":400,"sclk":5,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":4,"leads":4,"ords":0,"gmv":null,"v2l":0.2,"r5":0.4046,"replySec":262.8,"good":3,"top":0,"valid":274},{"d":"2026-11-04","vis":14,"exp":1261,"clk":24,"sexp":377,"sclk":9,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":3,"leads":3,"ords":0,"gmv":null,"v2l":0.0714,"r5":0.4094,"replySec":253.8,"good":3,"top":0,"valid":274},{"d":"2026-11-05","vis":23,"exp":1279,"clk":28,"sexp":376,"sclk":5,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":4,"leads":4,"ords":0,"gmv":null,"v2l":0.0434,"r5":0.4201,"replySec":233.4,"good":3,"top":0,"valid":274},{"d":"2026-11-06","vis":24,"exp":1315,"clk":35,"sexp":318,"sclk":13,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":0,"inqB":0,"tmB":2,"leads":2,"ords":0,"gmv":null,"v2l":0.0833,"r5":0.4176,"replySec":231.6,"good":3,"top":0,"valid":274},{"d":"2026-11-07","vis":12,"exp":1099,"clk":28,"sexp":275,"sclk":4,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":1,"inqB":1,"tmB":1,"leads":2,"ords":0,"gmv":null,"v2l":0,"r5":0.426,"replySec":232.20000000000002,"good":3,"top":0,"valid":274},{"d":"2026-11-08","vis":23,"exp":1498,"clk":41,"sexp":371,"sclk":7,"p4pImp":0,"p4pClk":0,"qztImp":0,"qztClk":0,"campImp":0,"campClk":0,"inq":1,"inqB":1,"tmB":5,"leads":6,"ords":0,"gmv":null,"v2l":0.1304,"r5":0.4364,"replySec":233.4,"good":3,"top":0,"valid":274}],"channels":[{"d":"2026-08-12","ch":"Top-Ranking Suppliers","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-12","ch":"会场","vis":4,"tmv":0,"inqv":0},{"d":"2026-08-12","ch":"其他","vis":8,"tmv":0,"inqv":0},{"d":"2026-08-12","ch":"店内","vis":4,"tmv":0,"inqv":0},{"d":"2026-08-12","ch":"搜索","vis":3,"tmv":0,"inqv":0},{"d":"2026-08-12","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-12","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-12","ch":"系统推荐","vis":3,"tmv":0,"inqv":0},{"d":"2026-08-12","ch":"询盘","vis":2,"tmv":1,"inqv":0},{"d":"2026-08-13","ch":"会场","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-13","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-13","ch":"其他","vis":5,"tmv":1,"inqv":0},{"d":"2026-08-13","ch":"店内","vis":4,"tmv":2,"inqv":0},{"d":"2026-08-13","ch":"搜索","vis":1,"tmv":1,"inqv":0},{"d":"2026-08-13","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-13","ch":"系统推荐","vis":6,"tmv":1,"inqv":0},{"d":"2026-08-13","ch":"询盘","vis":2,"tmv":2,"inqv":0},{"d":"2026-08-14","ch":"其他","vis":6,"tmv":0,"inqv":0},{"d":"2026-08-14","ch":"店内","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-14","ch":"搜索","vis":3,"tmv":0,"inqv":0},{"d":"2026-08-14","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-08-14","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-14","ch":"系统推荐","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-15","ch":"店内","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-15","ch":"搜索","vis":0,"tmv":0,"inqv":0},{"d":"2026-08-15","ch":"直接访问","vis":1,"tmv":1,"inqv":0},{"d":"2026-08-15","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-15","ch":"系统推荐","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-15","ch":"询盘","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-16","ch":"会场","vis":4,"tmv":0,"inqv":0},{"d":"2026-08-16","ch":"其他","vis":7,"tmv":1,"inqv":0},{"d":"2026-08-16","ch":"店内","vis":2,"tmv":1,"inqv":0},{"d":"2026-08-16","ch":"搜索","vis":4,"tmv":0,"inqv":0},{"d":"2026-08-16","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-08-16","ch":"站内收藏","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-16","ch":"系统推荐","vis":4,"tmv":1,"inqv":0},{"d":"2026-08-16","ch":"询盘","vis":3,"tmv":1,"inqv":0},{"d":"2026-08-17","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-17","ch":"其他","vis":3,"tmv":0,"inqv":0},{"d":"2026-08-17","ch":"店内","vis":2,"tmv":1,"inqv":0},{"d":"2026-08-17","ch":"搜索","vis":4,"tmv":0,"inqv":0},{"d":"2026-08-17","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-17","ch":"系统推荐","vis":5,"tmv":0,"inqv":0},{"d":"2026-08-17","ch":"询盘","vis":2,"tmv":1,"inqv":0},{"d":"2026-08-18","ch":"信保","vis":3,"tmv":3,"inqv":0},{"d":"2026-08-18","ch":"其他","vis":4,"tmv":2,"inqv":0},{"d":"2026-08-18","ch":"店内","vis":5,"tmv":3,"inqv":0},{"d":"2026-08-18","ch":"搜索","vis":6,"tmv":1,"inqv":0},{"d":"2026-08-18","ch":"站内收藏","vis":1,"tmv":1,"inqv":0},{"d":"2026-08-18","ch":"系统推荐","vis":11,"tmv":1,"inqv":0},{"d":"2026-08-18","ch":"询盘","vis":3,"tmv":2,"inqv":0},{"d":"2026-08-19","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-19","ch":"信保","vis":2,"tmv":2,"inqv":0},{"d":"2026-08-19","ch":"其他","vis":7,"tmv":1,"inqv":0},{"d":"2026-08-19","ch":"店内","vis":4,"tmv":0,"inqv":0},{"d":"2026-08-19","ch":"搜索","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-19","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-08-19","ch":"系统推荐","vis":4,"tmv":0,"inqv":0},{"d":"2026-08-20","ch":"会场","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-20","ch":"其他","vis":2,"tmv":1,"inqv":0},{"d":"2026-08-20","ch":"店内","vis":3,"tmv":2,"inqv":0},{"d":"2026-08-20","ch":"搜索","vis":4,"tmv":2,"inqv":0},{"d":"2026-08-20","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-08-20","ch":"站内收藏","vis":1,"tmv":1,"inqv":0},{"d":"2026-08-20","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-20","ch":"系统推荐","vis":3,"tmv":1,"inqv":0},{"d":"2026-08-20","ch":"询盘","vis":1,"tmv":1,"inqv":0},{"d":"2026-08-21","ch":"会场","vis":2,"tmv":1,"inqv":0},{"d":"2026-08-21","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-21","ch":"其他","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-21","ch":"店内","vis":0,"tmv":0,"inqv":0},{"d":"2026-08-21","ch":"搜索","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-21","ch":"直接访问","vis":3,"tmv":1,"inqv":1},{"d":"2026-08-21","ch":"系统推荐","vis":9,"tmv":2,"inqv":1},{"d":"2026-08-21","ch":"询盘","vis":4,"tmv":2,"inqv":1},{"d":"2026-08-22","ch":"会场","vis":3,"tmv":0,"inqv":0},{"d":"2026-08-22","ch":"信保","vis":1,"tmv":1,"inqv":0},{"d":"2026-08-22","ch":"其他","vis":3,"tmv":0,"inqv":0},{"d":"2026-08-22","ch":"店内","vis":0,"tmv":0,"inqv":0},{"d":"2026-08-22","ch":"搜索","vis":3,"tmv":0,"inqv":0},{"d":"2026-08-22","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-22","ch":"系统推荐","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-22","ch":"询盘","vis":4,"tmv":4,"inqv":0},{"d":"2026-08-23","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-23","ch":"其他","vis":4,"tmv":0,"inqv":0},{"d":"2026-08-23","ch":"店内","vis":0,"tmv":0,"inqv":0},{"d":"2026-08-23","ch":"搜索","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-23","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-23","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-23","ch":"系统推荐","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-23","ch":"询盘","vis":2,"tmv":2,"inqv":0},{"d":"2026-08-24","ch":"会场","vis":3,"tmv":0,"inqv":0},{"d":"2026-08-24","ch":"其他","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-24","ch":"店内","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-24","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-08-24","ch":"站内收藏","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-24","ch":"系统推荐","vis":0,"tmv":0,"inqv":0},{"d":"2026-08-24","ch":"询盘","vis":2,"tmv":1,"inqv":0},{"d":"2026-08-25","ch":"信保","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-25","ch":"其他","vis":4,"tmv":2,"inqv":0},{"d":"2026-08-25","ch":"店内","vis":4,"tmv":1,"inqv":0},{"d":"2026-08-25","ch":"搜索","vis":4,"tmv":1,"inqv":1},{"d":"2026-08-25","ch":"直接访问","vis":0,"tmv":0,"inqv":0},{"d":"2026-08-25","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-25","ch":"系统推荐","vis":2,"tmv":1,"inqv":1},{"d":"2026-08-25","ch":"询盘","vis":4,"tmv":1,"inqv":0},{"d":"2026-08-26","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-26","ch":"其他","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-26","ch":"店内","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-26","ch":"搜索","vis":3,"tmv":0,"inqv":0},{"d":"2026-08-26","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-08-26","ch":"系统推荐","vis":4,"tmv":0,"inqv":0},{"d":"2026-08-26","ch":"询盘","vis":2,"tmv":1,"inqv":0},{"d":"2026-08-27","ch":"信保","vis":1,"tmv":1,"inqv":0},{"d":"2026-08-27","ch":"其他","vis":3,"tmv":1,"inqv":0},{"d":"2026-08-27","ch":"店内","vis":2,"tmv":1,"inqv":0},{"d":"2026-08-27","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-27","ch":"系统推荐","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-27","ch":"询盘","vis":2,"tmv":1,"inqv":0},{"d":"2026-08-28","ch":"其他","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-28","ch":"店内","vis":0,"tmv":0,"inqv":0},{"d":"2026-08-28","ch":"搜索","vis":5,"tmv":1,"inqv":0},{"d":"2026-08-28","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-28","ch":"站外","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-28","ch":"系统推荐","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-29","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-29","ch":"其他","vis":5,"tmv":1,"inqv":0},{"d":"2026-08-29","ch":"店内","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-29","ch":"搜索","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-29","ch":"站内收藏","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-29","ch":"系统推荐","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-29","ch":"询盘","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-30","ch":"信保","vis":1,"tmv":1,"inqv":0},{"d":"2026-08-30","ch":"其他","vis":2,"tmv":0,"inqv":0},{"d":"2026-08-30","ch":"店内","vis":1,"tmv":1,"inqv":0},{"d":"2026-08-30","ch":"搜索","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-30","ch":"系统推荐","vis":1,"tmv":1,"inqv":0},{"d":"2026-08-30","ch":"询盘","vis":1,"tmv":1,"inqv":0},{"d":"2026-08-31","ch":"其他","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-31","ch":"搜索","vis":4,"tmv":0,"inqv":0},{"d":"2026-08-31","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-31","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-08-31","ch":"系统推荐","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-01","ch":"店内","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-01","ch":"搜索","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-01","ch":"系统推荐","vis":0,"tmv":0,"inqv":0},{"d":"2026-09-02","ch":"其他","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-02","ch":"店内","vis":0,"tmv":0,"inqv":0},{"d":"2026-09-02","ch":"搜索","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-02","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-02","ch":"站内收藏","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-02","ch":"系统推荐","vis":0,"tmv":0,"inqv":0},{"d":"2026-09-03","ch":"其他","vis":3,"tmv":1,"inqv":0},{"d":"2026-09-03","ch":"店内","vis":2,"tmv":1,"inqv":0},{"d":"2026-09-03","ch":"搜索","vis":0,"tmv":0,"inqv":0},{"d":"2026-09-03","ch":"直接访问","vis":0,"tmv":0,"inqv":0},{"d":"2026-09-03","ch":"系统推荐","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-04","ch":"其他","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-04","ch":"店内","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-04","ch":"搜索","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-04","ch":"直接访问","vis":0,"tmv":0,"inqv":0},{"d":"2026-09-04","ch":"系统推荐","vis":0,"tmv":0,"inqv":0},{"d":"2026-09-05","ch":"其他","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-05","ch":"店内","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-05","ch":"搜索","vis":6,"tmv":0,"inqv":0},{"d":"2026-09-05","ch":"系统推荐","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-06","ch":"信保","vis":1,"tmv":1,"inqv":0},{"d":"2026-09-06","ch":"搜索","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-06","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-07","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-07","ch":"其他","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-07","ch":"店内","vis":0,"tmv":0,"inqv":0},{"d":"2026-09-07","ch":"搜索","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-07","ch":"直接访问","vis":6,"tmv":0,"inqv":0},{"d":"2026-09-07","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-07","ch":"系统推荐","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-07","ch":"询盘","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-08","ch":"会场","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-08","ch":"信保","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-08","ch":"其他","vis":7,"tmv":0,"inqv":0},{"d":"2026-09-08","ch":"店内","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-08","ch":"搜索","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-08","ch":"直接访问","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-08","ch":"系统推荐","vis":8,"tmv":0,"inqv":0},{"d":"2026-09-08","ch":"询盘","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-09","ch":"会场","vis":2,"tmv":1,"inqv":0},{"d":"2026-09-09","ch":"信保","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-09","ch":"其他","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-09","ch":"店内","vis":0,"tmv":0,"inqv":0},{"d":"2026-09-09","ch":"搜索","vis":6,"tmv":0,"inqv":0},{"d":"2026-09-09","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-09","ch":"站内收藏","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-09","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-09","ch":"系统推荐","vis":6,"tmv":0,"inqv":0},{"d":"2026-09-10","ch":"会场","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-10","ch":"信保","vis":1,"tmv":1,"inqv":0},{"d":"2026-09-10","ch":"其他","vis":5,"tmv":0,"inqv":0},{"d":"2026-09-10","ch":"店内","vis":2,"tmv":1,"inqv":0},{"d":"2026-09-10","ch":"搜索","vis":7,"tmv":1,"inqv":0},{"d":"2026-09-10","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-10","ch":"系统推荐","vis":10,"tmv":1,"inqv":0},{"d":"2026-09-10","ch":"询盘","vis":1,"tmv":1,"inqv":0},{"d":"2026-09-11","ch":"Top-Ranking Suppliers","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-11","ch":"其他","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-11","ch":"搜索","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-11","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-11","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-11","ch":"系统推荐","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-11","ch":"询盘","vis":0,"tmv":0,"inqv":0},{"d":"2026-09-12","ch":"Top-Ranking Suppliers","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-12","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-12","ch":"信保","vis":2,"tmv":1,"inqv":0},{"d":"2026-09-12","ch":"其他","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-12","ch":"店内","vis":3,"tmv":1,"inqv":0},{"d":"2026-09-12","ch":"搜索","vis":7,"tmv":0,"inqv":0},{"d":"2026-09-12","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-12","ch":"系统推荐","vis":6,"tmv":0,"inqv":0},{"d":"2026-09-12","ch":"询盘","vis":3,"tmv":1,"inqv":0},{"d":"2026-09-13","ch":"会场","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-13","ch":"其他","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-13","ch":"店内","vis":2,"tmv":1,"inqv":0},{"d":"2026-09-13","ch":"搜索","vis":5,"tmv":2,"inqv":0},{"d":"2026-09-13","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-13","ch":"站内收藏","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-13","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-13","ch":"系统推荐","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-13","ch":"询盘","vis":2,"tmv":2,"inqv":0},{"d":"2026-09-14","ch":"Top-Ranking Suppliers","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-14","ch":"会场","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-14","ch":"其他","vis":5,"tmv":1,"inqv":0},{"d":"2026-09-14","ch":"店内","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-14","ch":"搜索","vis":2,"tmv":1,"inqv":0},{"d":"2026-09-14","ch":"直接访问","vis":5,"tmv":0,"inqv":0},{"d":"2026-09-14","ch":"系统推荐","vis":7,"tmv":1,"inqv":0},{"d":"2026-09-14","ch":"询盘","vis":2,"tmv":1,"inqv":0},{"d":"2026-09-15","ch":"信保","vis":2,"tmv":1,"inqv":0},{"d":"2026-09-15","ch":"其他","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-15","ch":"店内","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-15","ch":"搜索","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-15","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-15","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-15","ch":"系统推荐","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-15","ch":"询盘","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-16","ch":"会场","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-16","ch":"信保","vis":3,"tmv":1,"inqv":0},{"d":"2026-09-16","ch":"其他","vis":6,"tmv":1,"inqv":0},{"d":"2026-09-16","ch":"店内","vis":3,"tmv":1,"inqv":0},{"d":"2026-09-16","ch":"搜索","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-16","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-16","ch":"系统推荐","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-16","ch":"询盘","vis":1,"tmv":1,"inqv":0},{"d":"2026-09-17","ch":"会场","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-17","ch":"信保","vis":1,"tmv":1,"inqv":0},{"d":"2026-09-17","ch":"其他","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-17","ch":"店内","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-17","ch":"搜索","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-17","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-17","ch":"系统推荐","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-18","ch":"会场","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-18","ch":"其他","vis":6,"tmv":0,"inqv":0},{"d":"2026-09-18","ch":"店内","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-18","ch":"搜索","vis":6,"tmv":0,"inqv":0},{"d":"2026-09-18","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-18","ch":"系统推荐","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-19","ch":"Top-Ranking Suppliers","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-19","ch":"其他","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-19","ch":"店内","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-19","ch":"搜索","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-19","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-19","ch":"系统推荐","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-20","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-20","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-20","ch":"其他","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-20","ch":"店内","vis":0,"tmv":0,"inqv":0},{"d":"2026-09-20","ch":"搜索","vis":5,"tmv":1,"inqv":0},{"d":"2026-09-20","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-20","ch":"系统推荐","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-21","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-21","ch":"其他","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-21","ch":"店内","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-21","ch":"搜索","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-21","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-21","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-21","ch":"系统推荐","vis":3,"tmv":1,"inqv":0},{"d":"2026-09-21","ch":"询盘","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-22","ch":"会场","vis":0,"tmv":0,"inqv":0},{"d":"2026-09-22","ch":"其他","vis":2,"tmv":1,"inqv":0},{"d":"2026-09-22","ch":"店内","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-22","ch":"搜索","vis":5,"tmv":0,"inqv":0},{"d":"2026-09-22","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-22","ch":"系统推荐","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-22","ch":"询盘","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-23","ch":"Top-Ranking Suppliers","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-23","ch":"信保","vis":2,"tmv":1,"inqv":0},{"d":"2026-09-23","ch":"其他","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-23","ch":"店内","vis":3,"tmv":1,"inqv":0},{"d":"2026-09-23","ch":"搜索","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-23","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-23","ch":"系统推荐","vis":11,"tmv":2,"inqv":1},{"d":"2026-09-23","ch":"询盘","vis":3,"tmv":1,"inqv":0},{"d":"2026-09-24","ch":"Top-Ranking Suppliers","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-24","ch":"会场","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-24","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-24","ch":"其他","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-24","ch":"店内","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-24","ch":"搜索","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-24","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-24","ch":"站内收藏","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-24","ch":"系统推荐","vis":9,"tmv":1,"inqv":0},{"d":"2026-09-24","ch":"询盘","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-25","ch":"会场","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-25","ch":"信保","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-25","ch":"其他","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-25","ch":"店内","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-25","ch":"搜索","vis":5,"tmv":0,"inqv":0},{"d":"2026-09-25","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-25","ch":"系统推荐","vis":7,"tmv":1,"inqv":0},{"d":"2026-09-25","ch":"询盘","vis":3,"tmv":2,"inqv":0},{"d":"2026-09-26","ch":"会场","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-26","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-26","ch":"其他","vis":7,"tmv":1,"inqv":0},{"d":"2026-09-26","ch":"店内","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-26","ch":"搜索","vis":3,"tmv":1,"inqv":0},{"d":"2026-09-26","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-26","ch":"站外","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-26","ch":"系统推荐","vis":4,"tmv":2,"inqv":0},{"d":"2026-09-26","ch":"询盘","vis":4,"tmv":2,"inqv":0},{"d":"2026-09-27","ch":"会场","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-27","ch":"其他","vis":6,"tmv":0,"inqv":0},{"d":"2026-09-27","ch":"店内","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-27","ch":"搜索","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-27","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-27","ch":"站内收藏","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-27","ch":"系统推荐","vis":4,"tmv":0,"inqv":0},{"d":"2026-09-27","ch":"询盘","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-28","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-28","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-28","ch":"其他","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-28","ch":"店内","vis":5,"tmv":0,"inqv":0},{"d":"2026-09-28","ch":"搜索","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-28","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-09-28","ch":"站外","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-28","ch":"系统推荐","vis":5,"tmv":0,"inqv":0},{"d":"2026-09-28","ch":"询盘","vis":1,"tmv":1,"inqv":0},{"d":"2026-09-29","ch":"Top-Ranking Suppliers","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-29","ch":"会场","vis":2,"tmv":1,"inqv":0},{"d":"2026-09-29","ch":"其他","vis":5,"tmv":1,"inqv":1},{"d":"2026-09-29","ch":"店内","vis":3,"tmv":1,"inqv":1},{"d":"2026-09-29","ch":"搜索","vis":4,"tmv":1,"inqv":1},{"d":"2026-09-29","ch":"直接访问","vis":5,"tmv":0,"inqv":0},{"d":"2026-09-29","ch":"站内收藏","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-29","ch":"站外","vis":0,"tmv":0,"inqv":0},{"d":"2026-09-29","ch":"系统推荐","vis":6,"tmv":1,"inqv":0},{"d":"2026-09-29","ch":"询盘","vis":2,"tmv":1,"inqv":0},{"d":"2026-09-30","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-30","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-09-30","ch":"其他","vis":6,"tmv":0,"inqv":0},{"d":"2026-09-30","ch":"店内","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-30","ch":"搜索","vis":7,"tmv":0,"inqv":0},{"d":"2026-09-30","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-09-30","ch":"系统推荐","vis":7,"tmv":0,"inqv":0},{"d":"2026-10-01","ch":"信保","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-01","ch":"其他","vis":3,"tmv":1,"inqv":0},{"d":"2026-10-01","ch":"店内","vis":5,"tmv":0,"inqv":0},{"d":"2026-10-01","ch":"搜索","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-01","ch":"直接访问","vis":5,"tmv":0,"inqv":0},{"d":"2026-10-01","ch":"系统推荐","vis":13,"tmv":0,"inqv":0},{"d":"2026-10-01","ch":"询盘","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-02","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-02","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-02","ch":"其他","vis":5,"tmv":0,"inqv":0},{"d":"2026-10-02","ch":"店内","vis":4,"tmv":0,"inqv":0},{"d":"2026-10-02","ch":"搜索","vis":4,"tmv":0,"inqv":0},{"d":"2026-10-02","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-02","ch":"系统推荐","vis":6,"tmv":0,"inqv":0},{"d":"2026-10-02","ch":"询盘","vis":2,"tmv":1,"inqv":0},{"d":"2026-10-03","ch":"其他","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-03","ch":"店内","vis":4,"tmv":1,"inqv":0},{"d":"2026-10-03","ch":"搜索","vis":4,"tmv":0,"inqv":0},{"d":"2026-10-03","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-03","ch":"系统推荐","vis":7,"tmv":0,"inqv":0},{"d":"2026-10-03","ch":"询盘","vis":3,"tmv":1,"inqv":0},{"d":"2026-10-04","ch":"Top-Ranking Suppliers","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-04","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-04","ch":"其他","vis":6,"tmv":0,"inqv":0},{"d":"2026-10-04","ch":"店内","vis":5,"tmv":0,"inqv":0},{"d":"2026-10-04","ch":"搜索","vis":7,"tmv":0,"inqv":1},{"d":"2026-10-04","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-04","ch":"站内收藏","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-04","ch":"系统推荐","vis":9,"tmv":0,"inqv":0},{"d":"2026-10-05","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-05","ch":"信保","vis":2,"tmv":2,"inqv":0},{"d":"2026-10-05","ch":"其他","vis":5,"tmv":0,"inqv":0},{"d":"2026-10-05","ch":"店内","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-05","ch":"搜索","vis":10,"tmv":0,"inqv":0},{"d":"2026-10-05","ch":"直接访问","vis":4,"tmv":0,"inqv":0},{"d":"2026-10-05","ch":"站外","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-05","ch":"系统推荐","vis":7,"tmv":0,"inqv":0},{"d":"2026-10-05","ch":"询盘","vis":3,"tmv":2,"inqv":0},{"d":"2026-10-06","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-06","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-06","ch":"其他","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-06","ch":"搜索","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-06","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-06","ch":"系统推荐","vis":5,"tmv":0,"inqv":0},{"d":"2026-10-06","ch":"询盘","vis":2,"tmv":1,"inqv":0},{"d":"2026-10-07","ch":"会场","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-07","ch":"其他","vis":8,"tmv":0,"inqv":0},{"d":"2026-10-07","ch":"店内","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-07","ch":"搜索","vis":9,"tmv":0,"inqv":0},{"d":"2026-10-07","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-07","ch":"站外","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-07","ch":"系统推荐","vis":7,"tmv":0,"inqv":0},{"d":"2026-10-07","ch":"询盘","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-08","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-08","ch":"信保","vis":2,"tmv":1,"inqv":0},{"d":"2026-10-08","ch":"其他","vis":5,"tmv":0,"inqv":0},{"d":"2026-10-08","ch":"店内","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-08","ch":"搜索","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-08","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-08","ch":"站内收藏","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-08","ch":"系统推荐","vis":8,"tmv":0,"inqv":0},{"d":"2026-10-08","ch":"询盘","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-09","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-09","ch":"其他","vis":5,"tmv":1,"inqv":0},{"d":"2026-10-09","ch":"搜索","vis":6,"tmv":0,"inqv":0},{"d":"2026-10-09","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-09","ch":"站内收藏","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-09","ch":"站外","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-09","ch":"系统推荐","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-09","ch":"询盘","vis":0,"tmv":0,"inqv":0},{"d":"2026-10-10","ch":"Top-Ranking Suppliers","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-10","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-10","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-10","ch":"其他","vis":7,"tmv":1,"inqv":0},{"d":"2026-10-10","ch":"店内","vis":5,"tmv":1,"inqv":0},{"d":"2026-10-10","ch":"搜索","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-10","ch":"直接访问","vis":4,"tmv":1,"inqv":0},{"d":"2026-10-10","ch":"站内收藏","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-10","ch":"系统推荐","vis":7,"tmv":1,"inqv":0},{"d":"2026-10-10","ch":"询盘","vis":2,"tmv":1,"inqv":0},{"d":"2026-10-11","ch":"其他","vis":7,"tmv":2,"inqv":0},{"d":"2026-10-11","ch":"店内","vis":4,"tmv":2,"inqv":0},{"d":"2026-10-11","ch":"搜索","vis":5,"tmv":0,"inqv":0},{"d":"2026-10-11","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-11","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-11","ch":"系统推荐","vis":7,"tmv":2,"inqv":0},{"d":"2026-10-11","ch":"询盘","vis":5,"tmv":2,"inqv":0},{"d":"2026-10-12","ch":"会场","vis":2,"tmv":1,"inqv":0},{"d":"2026-10-12","ch":"信保","vis":2,"tmv":2,"inqv":0},{"d":"2026-10-12","ch":"其他","vis":6,"tmv":1,"inqv":0},{"d":"2026-10-12","ch":"店内","vis":5,"tmv":2,"inqv":0},{"d":"2026-10-12","ch":"搜索","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-12","ch":"直接访问","vis":3,"tmv":2,"inqv":0},{"d":"2026-10-12","ch":"站内收藏","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-12","ch":"系统推荐","vis":6,"tmv":0,"inqv":0},{"d":"2026-10-13","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-13","ch":"其他","vis":8,"tmv":1,"inqv":0},{"d":"2026-10-13","ch":"店内","vis":3,"tmv":1,"inqv":0},{"d":"2026-10-13","ch":"搜索","vis":7,"tmv":0,"inqv":0},{"d":"2026-10-13","ch":"直接访问","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-13","ch":"站内收藏","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-13","ch":"站外","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-13","ch":"系统推荐","vis":5,"tmv":1,"inqv":0},{"d":"2026-10-13","ch":"询盘","vis":3,"tmv":2,"inqv":0},{"d":"2026-10-14","ch":"信保","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-14","ch":"其他","vis":5,"tmv":2,"inqv":0},{"d":"2026-10-14","ch":"店内","vis":2,"tmv":2,"inqv":0},{"d":"2026-10-14","ch":"搜索","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-14","ch":"直接访问","vis":2,"tmv":1,"inqv":0},{"d":"2026-10-14","ch":"站内收藏","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-14","ch":"站外","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-14","ch":"系统推荐","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-14","ch":"询盘","vis":2,"tmv":2,"inqv":0},{"d":"2026-10-15","ch":"其他","vis":4,"tmv":2,"inqv":0},{"d":"2026-10-15","ch":"店内","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-15","ch":"搜索","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-15","ch":"直接访问","vis":6,"tmv":3,"inqv":0},{"d":"2026-10-15","ch":"系统推荐","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-15","ch":"询盘","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-16","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-16","ch":"其他","vis":7,"tmv":1,"inqv":0},{"d":"2026-10-16","ch":"搜索","vis":3,"tmv":1,"inqv":1},{"d":"2026-10-16","ch":"直接访问","vis":4,"tmv":2,"inqv":0},{"d":"2026-10-16","ch":"系统推荐","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-16","ch":"询盘","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-17","ch":"信保","vis":2,"tmv":2,"inqv":0},{"d":"2026-10-17","ch":"其他","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-17","ch":"店内","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-17","ch":"搜索","vis":6,"tmv":0,"inqv":0},{"d":"2026-10-17","ch":"直接访问","vis":4,"tmv":1,"inqv":0},{"d":"2026-10-17","ch":"系统推荐","vis":5,"tmv":0,"inqv":0},{"d":"2026-10-17","ch":"询盘","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-18","ch":"Top-Ranking Suppliers","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-18","ch":"信保","vis":3,"tmv":1,"inqv":0},{"d":"2026-10-18","ch":"其他","vis":5,"tmv":1,"inqv":1},{"d":"2026-10-18","ch":"店内","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-18","ch":"搜索","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-18","ch":"直接访问","vis":4,"tmv":1,"inqv":0},{"d":"2026-10-18","ch":"系统推荐","vis":4,"tmv":0,"inqv":0},{"d":"2026-10-18","ch":"询盘","vis":4,"tmv":0,"inqv":0},{"d":"2026-10-19","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-19","ch":"其他","vis":6,"tmv":1,"inqv":0},{"d":"2026-10-19","ch":"店内","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-19","ch":"搜索","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-19","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-19","ch":"系统推荐","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-19","ch":"询盘","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-20","ch":"信保","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-20","ch":"其他","vis":3,"tmv":1,"inqv":0},{"d":"2026-10-20","ch":"店内","vis":4,"tmv":0,"inqv":0},{"d":"2026-10-20","ch":"搜索","vis":5,"tmv":0,"inqv":0},{"d":"2026-10-20","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-20","ch":"站内收藏","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-20","ch":"系统推荐","vis":5,"tmv":1,"inqv":0},{"d":"2026-10-20","ch":"询盘","vis":2,"tmv":1,"inqv":0},{"d":"2026-10-21","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-21","ch":"其他","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-21","ch":"店内","vis":2,"tmv":1,"inqv":0},{"d":"2026-10-21","ch":"搜索","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-21","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-21","ch":"系统推荐","vis":2,"tmv":1,"inqv":0},{"d":"2026-10-21","ch":"询盘","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-22","ch":"其他","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-22","ch":"店内","vis":3,"tmv":1,"inqv":0},{"d":"2026-10-22","ch":"搜索","vis":4,"tmv":0,"inqv":0},{"d":"2026-10-22","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-22","ch":"系统推荐","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-22","ch":"询盘","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-23","ch":"Top-Ranking Suppliers","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-23","ch":"其他","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-23","ch":"店内","vis":0,"tmv":0,"inqv":0},{"d":"2026-10-23","ch":"搜索","vis":4,"tmv":0,"inqv":0},{"d":"2026-10-23","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-23","ch":"系统推荐","vis":4,"tmv":1,"inqv":0},{"d":"2026-10-23","ch":"询盘","vis":2,"tmv":2,"inqv":0},{"d":"2026-10-24","ch":"其他","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-24","ch":"搜索","vis":6,"tmv":1,"inqv":0},{"d":"2026-10-24","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-24","ch":"系统推荐","vis":4,"tmv":0,"inqv":0},{"d":"2026-10-24","ch":"询盘","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-25","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-25","ch":"其他","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-25","ch":"店内","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-25","ch":"搜索","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-25","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-25","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-25","ch":"系统推荐","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-25","ch":"询盘","vis":2,"tmv":1,"inqv":0},{"d":"2026-10-26","ch":"其他","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-26","ch":"店内","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-26","ch":"搜索","vis":4,"tmv":0,"inqv":0},{"d":"2026-10-26","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-26","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-26","ch":"系统推荐","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-27","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-27","ch":"信保","vis":2,"tmv":1,"inqv":0},{"d":"2026-10-27","ch":"其他","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-27","ch":"店内","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-27","ch":"搜索","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-27","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-27","ch":"站内收藏","vis":1,"tmv":1,"inqv":0},{"d":"2026-10-27","ch":"系统推荐","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-27","ch":"询盘","vis":2,"tmv":1,"inqv":0},{"d":"2026-10-28","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-28","ch":"其他","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-28","ch":"店内","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-28","ch":"搜索","vis":5,"tmv":1,"inqv":1},{"d":"2026-10-28","ch":"系统推荐","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-28","ch":"询盘","vis":2,"tmv":1,"inqv":1},{"d":"2026-10-29","ch":"Top-Ranking Suppliers","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-29","ch":"其他","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-29","ch":"店内","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-29","ch":"搜索","vis":4,"tmv":0,"inqv":0},{"d":"2026-10-29","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-29","ch":"系统推荐","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-30","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-30","ch":"其他","vis":8,"tmv":1,"inqv":1},{"d":"2026-10-30","ch":"店内","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-30","ch":"搜索","vis":7,"tmv":0,"inqv":0},{"d":"2026-10-30","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-30","ch":"站内收藏","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-30","ch":"系统推荐","vis":6,"tmv":0,"inqv":0},{"d":"2026-10-30","ch":"询盘","vis":0,"tmv":0,"inqv":0},{"d":"2026-10-31","ch":"Top-Ranking Suppliers","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-31","ch":"会场","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-31","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-10-31","ch":"其他","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-31","ch":"店内","vis":3,"tmv":0,"inqv":0},{"d":"2026-10-31","ch":"搜索","vis":4,"tmv":0,"inqv":0},{"d":"2026-10-31","ch":"直接访问","vis":2,"tmv":0,"inqv":0},{"d":"2026-10-31","ch":"系统推荐","vis":4,"tmv":0,"inqv":0},{"d":"2026-10-31","ch":"询盘","vis":1,"tmv":0,"inqv":0},{"d":"2026-11-01","ch":"Top-Ranking Suppliers","vis":1,"tmv":0,"inqv":0},{"d":"2026-11-01","ch":"会场","vis":5,"tmv":1,"inqv":0},{"d":"2026-11-01","ch":"其他","vis":3,"tmv":0,"inqv":0},{"d":"2026-11-01","ch":"店内","vis":3,"tmv":3,"inqv":0},{"d":"2026-11-01","ch":"搜索","vis":5,"tmv":1,"inqv":0},{"d":"2026-11-01","ch":"直接访问","vis":5,"tmv":1,"inqv":0},{"d":"2026-11-01","ch":"站外","vis":2,"tmv":0,"inqv":0},{"d":"2026-11-01","ch":"系统推荐","vis":10,"tmv":2,"inqv":0},{"d":"2026-11-01","ch":"询盘","vis":1,"tmv":1,"inqv":0},{"d":"2026-11-02","ch":"会场","vis":3,"tmv":0,"inqv":0},{"d":"2026-11-02","ch":"其他","vis":10,"tmv":2,"inqv":0},{"d":"2026-11-02","ch":"店内","vis":6,"tmv":2,"inqv":0},{"d":"2026-11-02","ch":"搜索","vis":8,"tmv":0,"inqv":0},{"d":"2026-11-02","ch":"直接访问","vis":5,"tmv":1,"inqv":0},{"d":"2026-11-02","ch":"站外","vis":1,"tmv":1,"inqv":0},{"d":"2026-11-02","ch":"系统推荐","vis":8,"tmv":1,"inqv":0},{"d":"2026-11-02","ch":"询盘","vis":4,"tmv":2,"inqv":0},{"d":"2026-11-03","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-11-03","ch":"其他","vis":2,"tmv":1,"inqv":0},{"d":"2026-11-03","ch":"店内","vis":1,"tmv":0,"inqv":0},{"d":"2026-11-03","ch":"搜索","vis":3,"tmv":1,"inqv":0},{"d":"2026-11-03","ch":"直接访问","vis":3,"tmv":1,"inqv":0},{"d":"2026-11-03","ch":"站外","vis":1,"tmv":0,"inqv":0},{"d":"2026-11-03","ch":"系统推荐","vis":1,"tmv":0,"inqv":0},{"d":"2026-11-03","ch":"询盘","vis":2,"tmv":1,"inqv":0},{"d":"2026-11-04","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-11-04","ch":"其他","vis":1,"tmv":0,"inqv":0},{"d":"2026-11-04","ch":"店内","vis":1,"tmv":0,"inqv":0},{"d":"2026-11-04","ch":"搜索","vis":5,"tmv":0,"inqv":0},{"d":"2026-11-04","ch":"直接访问","vis":4,"tmv":1,"inqv":0},{"d":"2026-11-04","ch":"系统推荐","vis":3,"tmv":0,"inqv":0},{"d":"2026-11-05","ch":"会场","vis":1,"tmv":0,"inqv":0},{"d":"2026-11-05","ch":"其他","vis":6,"tmv":1,"inqv":0},{"d":"2026-11-05","ch":"店内","vis":3,"tmv":0,"inqv":0},{"d":"2026-11-05","ch":"搜索","vis":5,"tmv":0,"inqv":0},{"d":"2026-11-05","ch":"直接访问","vis":7,"tmv":0,"inqv":0},{"d":"2026-11-05","ch":"系统推荐","vis":4,"tmv":0,"inqv":0},{"d":"2026-11-05","ch":"询盘","vis":3,"tmv":0,"inqv":0},{"d":"2026-11-06","ch":"会场","vis":2,"tmv":0,"inqv":0},{"d":"2026-11-06","ch":"其他","vis":6,"tmv":0,"inqv":0},{"d":"2026-11-06","ch":"店内","vis":2,"tmv":0,"inqv":0},{"d":"2026-11-06","ch":"搜索","vis":9,"tmv":1,"inqv":0},{"d":"2026-11-06","ch":"直接访问","vis":3,"tmv":0,"inqv":0},{"d":"2026-11-06","ch":"系统推荐","vis":8,"tmv":1,"inqv":0},{"d":"2026-11-06","ch":"询盘","vis":2,"tmv":2,"inqv":0},{"d":"2026-11-07","ch":"信保","vis":1,"tmv":0,"inqv":0},{"d":"2026-11-07","ch":"其他","vis":6,"tmv":0,"inqv":0},{"d":"2026-11-07","ch":"店内","vis":3,"tmv":0,"inqv":0},{"d":"2026-11-07","ch":"搜索","vis":3,"tmv":0,"inqv":0},{"d":"2026-11-07","ch":"直接访问","vis":1,"tmv":0,"inqv":0},{"d":"2026-11-07","ch":"系统推荐","vis":2,"tmv":0,"inqv":0},{"d":"2026-11-08","ch":"Top-Ranking Suppliers","vis":1,"tmv":0,"inqv":0},{"d":"2026-11-08","ch":"其他","vis":6,"tmv":1,"inqv":1},{"d":"2026-11-08","ch":"店内","vis":1,"tmv":0,"inqv":0},{"d":"2026-11-08","ch":"搜索","vis":4,"tmv":0,"inqv":0},{"d":"2026-11-08","ch":"直接访问","vis":9,"tmv":1,"inqv":0},{"d":"2026-11-08","ch":"系统推荐","vis":7,"tmv":1,"inqv":0},{"d":"2026-11-08","ch":"询盘","vis":2,"tmv":0,"inqv":0}],"products":[{"id":"","stage":"潜力优品","name":"High Security Smart Door Lock with APP Control/Fingerprint/Password/Card for Residential & Commercial Use","imp":1,"clk":0,"ctr":0,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":13,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Navicat Tuya WiFi Smart Door Lock with Fingerprint 3D Face Recognition Video Intercom Camera Memory Card for Wood Door","imp":9,"clk":0,"ctr":0,"vis":2,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":11,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"优品","name":"New Security Tuya 5050 Mortise Fingerprint Password Card Key Unlock Smart Door Lock for Home Apartment","imp":16,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":9,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Volibel Hot Selling Zinc Alloy Biometric Fingerprint Mini Smart Padlock for Cabinet","imp":8,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":5,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Smart Home 5050 Mortise TTlock APP Fingerprint Password Rfid Card Tuya Smart Door Lock for Hotel Apartment","imp":13,"clk":2,"ctr":0.1538,"vis":3,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":3,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Volibel Waterproof Tuya App WiFi Double Sided Fingerprint Smart Door Lock Ttlock Rim Lock Memory Card Cloud Storage Wood Door","imp":5,"clk":0,"ctr":0,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":3,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Security Smart Home Tuya Wi-Fi 1080P Video Door Phone Two-way Audio AI Motion Detection Color Night Vision Water Resistant","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":3,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Smart Lock M1 Smart Home System Full Automatic Security Door Lock Electric Keyless Digital Fingerprint Combination Smart Lock","imp":8,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":2,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Best Price 6068 Mortise TTLock APP Fingerprint Password Rfid Card Key Smart Door Lock for Hotel Apartment","imp":5,"clk":0,"ctr":0,"vis":2,"inq":1,"inqB":1,"tm":0,"leadsDay":0,"leads":2,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Volibel Security Nfc Digital Password Card Keyless Padlock Fingerprint Ttlock App Unlock Smart Padlock","imp":4,"clk":0,"ctr":0,"vis":2,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":2,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"3MP HD Outdoor Security Tuya WiFi Camera with Night Vision CMOS Sensor IP65 Waterproof Big Battery & 5W Solar Panel","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":2,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"优品","name":"2024 Latest Electric Control Smart Gate Water Proof Fingerprint Outdoor WiFi Door Lock with Rim for Aluminum/Steel Door","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":2,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Hot Sale 5050 Mortise Anti-thief Fingerprint Password Key Tuya WIFI TTlock Smart Door Lock for Home Apartment","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":2,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"New Security Aluminum Alloy 6068 Mortise Video Cat Eye Tuya APP WIFI Unlock Smart Door Lock With Camera","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":2,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Security Ttlock Fingerprint Electronic Digital 5050 Mortise Wifi Tuya Smart Door Lock for Home Apartment Hotel","imp":1,"clk":0,"ctr":0,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":2,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Automatic Biometric Lock RFID IC Card Wi-Fi Combination Home Security Lock Tuya TTlock Smart Lock for Wood Door Cloud Storage","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":2,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"New 3D Face Recognition Voice Intercom Waterproof IP65 3585 Mortise Tuya WIFI Rechargeable Anti-thief Smart Lock","imp":15,"clk":1,"ctr":0.0667,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Smart Home Security Anti-theft Tuya TT Lock APP Password Fingerprint WiFi Smart Door Lock With Camera for Home Apartment Office","imp":9,"clk":1,"ctr":0.1111,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"优品","name":"Brand New Waterproof Anti-theft High Recognition Fingerprint Password Screen Tuya TTlock Smart Door Lock for Home Apartment","imp":6,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Factory Hot Selling Password Fingerprint  Aluminum Alloy Remote Unlock Tuya TTlock WIFI Smart Door Lock","imp":6,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"3D Face Recognition TTLock APP Video 6068 Electronic Security Smart Door Lock With 6 Unlock Ways","imp":6,"clk":0,"ctr":0,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":1,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"High Security 3D Face Double Screen Wireless Tuya WiFi Fingerprint Password Smart Door Lock IP65 Waterproof 480P Camera Cloud","imp":5,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Intelligent Tuya App Fingerprint Unlock Keyless Entry Blue Tooth Free App Ic Card Anti-Peep Code Door Lock with Alexa","imp":4,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Security Blue-Tooth WiFi Tuya Keyless Automatic Digital Password Card Biometric Fingerprint Blue-Tooth TTLock Smart Door Lock","imp":4,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Navicat Smart Digital Electronic Security Door Lock Biometric Fingerprint Keyless Rfid Card Automatic Door Locks Tuya TTLock App","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Home Security WIFI Tuya TTLock Digital Password Fingerprint Rfid Card Key 5 Ways Unlock Smart Magnetic Door Lock","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"High Security OEM Waterproof Cloud Steel Door Smart Digital Hotel Home Biometric WiFi Fingerprint Door Lock","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Face Recognition Smart Door Lock Household Anti-Theft Door Automatic Fingerprint Lock Entry Door Password Lock with Peep","imp":1,"clk":1,"ctr":1,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Remote Control Portable Fireproof Jewelry Cash Outdoor Key Mini Car Fingerprint Safe Box","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Tuya Fingerprint Touch Screen Keyless Smart Locks Portable Home High Security Anti Theft Privacy Smart Door Locks","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"New Arrival Tuya WIFI TT Lock Aluminum Waterproof 5050 Mortise Smart Door Lock for Home Office Apartment Hotel","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Apartment TTLock Tuya APP Double Fingerprint Password Rfid Card Smart Door Lock With Waterproof 8 Languages","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"M300 Keyless Access  Tuya App Control for Blue-tooth Auto Lock Sensor Aluminum Smart Door Lock for Wood Door Without Dril","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Easy Install Indoor Room Lock Tuya Blue-Tooth App Handle Ball Knob Lock Cylindrical Smart Round Door Knob Lock","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"1080P Wireless Tuya Night Vision Intercom WiFi Battery Video Doorbell Indoor Chime 5200mAh Battery Water Resistant Easy","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Security Two-way Audio Tuya Smart 3MP CMOS Sensor Baby Monitor with Night Vision WiFi Camera SD Card & Cloud Storage","imp":1,"clk":0,"ctr":0,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Dual Light Night Vision IP65 Waterproof Two Way Voice Tuya 3MP HD CMOS Sensor PTZ Network Camera with Battery Power","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Display Handle Hotel Keyless High Security Smart Door Lock Fingerprint Online","imp":0,"clk":0,"ctr":0,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":1,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Volibel Safety Electric Digital Cat Eyes Fingerprint Wifi Tuya Smart Door Lock With Camera for Home Apartment","imp":9,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"2024 New Household Electronic Fingerprint Identification Code Tuya TTlock Smart Lock Wooden Door Door Lock","imp":6,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Safety Deposit Box Biometric Fingerprint Quick-Access Password Key Smart Home Devices Safes Box","imp":6,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"High Security Waterproof Digital Biometric Fingerprint Blue-tooth Ttlock APP Aluminum Sliding Smart Door Lock","imp":6,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Smart Home Safer Anti-theft Tuya WIFI TTlock Blue-tooth Cloud Storage 5050 Mortise Aluminum Alloy Smart Door Lock","imp":6,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Deftun L1 Stainless Steel Iron Lock Body 6068 5050 3585 Single/Dual Tongue Mortise for Smart Lock Fingerprint/Password/Key","imp":6,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Smart Home Hotel Garage Roller Curtain AC123-01 Auto Curtain Motor Single Channel Handle Tuya WiFi Remote Control","imp":6,"clk":0,"ctr":0,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"UK WiFi Smart Socket Tuya 16A with ABS & Tempered Glass Panel Industrial Use Alexa & Google Home Compatible","imp":6,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"High Quality Micro Travel Cabinet Padlock Gym Keyless Finger Print Wifi Blue Tooth Smart Padlock App Tuya Smart Locks","imp":5,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"High Quality Cheap Electronic Smart Handle Door Lock System Hotel Lock with Tthotel Ttlock","imp":5,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Double Protection Zinc Alloy Led Screen Keyless Electric Biometric Digital Tuya App Password Card Access Door with Camera","imp":5,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"2024 New Smart Door Lock Tuya APP Fingerprint 3585 Mortise Smart Lock for Sliding Aluminum Door Waterproof","imp":5,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Intelligent Number Small Smart Main Fingerprint Electronic Access Mobile Control Smart Security Doors Lock","imp":4,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Tuya Ttlock Biometric Fingerprint Blue Tooth Keyless Entry Keypad Capability Battery Powered Smart Lock","imp":4,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Stainless Steel Fingerprint House Door Lock for Office Door Main Door Handles Lock Electrical Panel Lock Key","imp":4,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Navicat Silver Slot Lock Box Guide Film Door Frame Wooden Door Special Accessories Lock Stainless Steel Buckle Cloud Memory Card","imp":4,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Indoor Spherical Fingerprint Lock Office Home Apartment Hotel Wooden Door Electronic Sensor Lock Tuya Wifi Smart Ball Lock","imp":4,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"More Popular Keyless Entry Digital Fingerprint Password Tuya App Wifi Smart Door Lock With Camera for Apartment Room","imp":4,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Manufacture Hot Sale Fingerprint Digital Password Only Door Handle Fingerprint Touch Wifi Tuya Hotel Smart Lock","imp":4,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"New Product 2024 Popular 3d Face Recognition Fully Automatic Electronic Intelligent Password Sliding Door Smart Lock","imp":4,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Waterproof IP65 Ttlock Tuya App Blue-Tooth WIFI 3585 Mortise Remote Unlock Aluminum Sliding Smart Door Lock","imp":4,"clk":1,"ctr":0.25,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Waterproof Tuya Ttlock APP Wifi Electronic Fingerprint Keyless Intelligent Door Handle Lock Smart Sliding Electric Door Lock","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Zigbee Automatic Nfc Aluminum Security Keyless Tuya Smart Digital Door Lock","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Navicat Factory Cerradura Electronic Tuya Smart Handle Wireless Door Lock Fingerprint Digital Keyless Smart Hotel Door Lock","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Waterproof Tuya Wifi Smart Door Lock Digital Password Double-Sided Fingerprint Electronic Rim Lock for Outdoor Iron Gate Door","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Waterproof Tuya Wifi Smart Door Lock Digital Password Single-Sided Fingerprint Electronic Rim Smart Lock for Outdoor Iron Door","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"High Quality Security Keyless Digital Biometric Fingerprint Password Wifi Tuya App Zigbee3.0 Remote Smart Door Lock","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Smart Lock H-03 Tuya Smart WiFi Digital Door Lock Code Card Smartphone Unlock Fingerprint Face Scene Smart Door Lock for Home","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Volibel High Security Digital Fingerprint Lock with Cat Eyes Wifi Remote Control Tuya Smart Door Camera for Aluminum Wood Doors","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Security Fingerprint Door Lock Electronic Digital Smart Lock TTlock Tuya App Rfid Card Password Smart Door Lock for Home Office","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"2024 New Product High Security OEM Waterproof Smart Digital  Hotel Home Biometric Fingerprint Smart Door Lock Without Wifi","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Deftun Tuya Wifi Wireless Remote Control Password Rfid Card Fingerprint Digital Smart Door Lock for Wooden Door","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"High Security OEM Waterproof Smart Digital Hotel Home Biometric Fingerprint Stainless Steel Door Cloud Smart Door Lock","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"3D Face Recognition Video Intercom 6068 Mortise Tuya APP WIFI Multilingual Smart Door Lock With Camera","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Smart Home European Standard 3585 Mortise 304 Stainless Steel APP Remote Unlock Smart Door Lock Waterproof IP64","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"E26/27 Lamp Head Design WiFi Camera Night Vision CMOS Sensor Memory Card Support Two-Way Audio Tuya 3MP Bulb IP Camera","imp":3,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"High Security Tuya Wifi App Biometric Fingerprint Password Electronic Digital Blue-Tooth Ttlock Zigbee3.0 Smart Door Lock","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"High Quality Tuya WiFi App Biometric Fingerprint 3D Face Recognition Cloud Smart Camera Lock for Wood/Steel Multi-Authentication","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Volibel OEM Home Security Smart Digital Biometric Fingerprint Lock Rfid Card Wifi App Ttlock Tuya Smart Door Lock With Camera","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"High Quality Aluminum Alloy Smart Lock for Wood Door with Fingerprint for Passcode & Cloud Storage-for Hotels & Home Use","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"低质品","name":"American Push Pull Smart Nfc Magnetic Main Gate Door Lock with Remote Control","imp":2,"clk":0,"ctr":0,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Front Hidden Home Digital Push Pull Smart Door Handle Lock Modern Zinc Alloy Smart Locks Digital Door Lock","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Mini Waterproof Smart Blue Tooth Padlocks App Keyless Biometric Fingerprint Top Security Smart Padlocks","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Biometric Electronic Smart Mortise Locks Multipoint Security Id Card Reader for Home Apartment Compatible Wood Aluminum WiFi","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Custom App Magnetic Automatic Sliding Auto Electric Tuya Smart Lock Wifi Gate Central Zigbee Door Fingerprint Smart Lock","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Biometric Fingerprint Keypad Auto Open Lid Interior Light Home Nightstand Car Safes Box","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Ttlock USB Rfid Card Internet Wifi Card Encoder for Hotel Door Lock System","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Volibel Digital Fingerprint Automatic Biometric Rfid Card Tuya Wifi App Combination Home Security Smart Door Lock With Camera","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Volibel European Tuya Ttlock App Rfid Card Intelligent Biometric Fingerprint Smart Cylinder Door Lock","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Navicat Electronic Smart Password Digital Internal Glass Door Lock with Biometric Fingerprint Sliding Door Locks","imp":2,"clk":1,"ctr":0.5,"vis":2,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Automatic Wireless Iron Solenoid Swing Gate Lock Outdoor Keypad Handle for Steel/Aluminum/Brass/Wood Doors WiFi Connectivity","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Volibel 2024 Keyless Digital Password Access Smart Door Lock WiFi Control Plate Recognition Peep Hole Camera-New Tuya Smart Door","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"TTlock Remote Control","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Waterproof Outdoor WiFi Tuya App Biometric Fingerprint Ttlock Smart Rim Door Lock with Memory Card for Steel/Glass Doors","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Volibel H5 Smart Lock for Glass Door with Fingerprint Password Card Key for Unlock Via Tuya App","imp":2,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Fingerprint Handle Door Lock Electronic Digital Password Waterproof RFID Card Smartsteps Smart Door Lock","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Factory Price Tuya Wifi App Biometric Fingerprint Password Door Lock Keyless Electronic Lock Digital Smart Locks for Home Hotel","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Waterproof Tuya Wifi App Sliding Aluminum Door Lock Digital Electronic Biometric Fingerprint Door Lock","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Electronic Money Hidden Storage Safety Aluminum Personal Fireproof Smart Safe Box","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"低质品","name":"WiFi Connected Cloud Biometric Push-Pull Main Gate Handle Outdoor Home Smart Lock Aluminum Alloy Construction for Aluminum/Wood","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Fingerprint Password Home Anti-Theft Mobile Phone APP Unlock Electronic Remote Control Smart Lock","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Hot Sell Electronic Door Lock Entry Smart Digital Smart Electronic Door Lock with Keypad Fingerprint Touch Screen","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Password Rfid Digital Electric Doorbell Wholesale Smart Fingerprint Door Lock With Camera Outdoor Water Proof Smart Door Lock","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Digital Door Lock Smart TTLock Tuya App Door Lock with Rfid Card Key Password Fingerprint Smart Door Lock Alexa","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Waterproof Outdoor High Security Electric Digital Fingerprint Tuya APP TTLOCK Wifi Mobile Lock Smart Door Lock","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Navicat Waterproof Tuya Wifi App Smarlock Door Biometric Lock Fingerprint Door Handle Digital Keyless Ttlock Lock","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Waterproof Aluminum Door Fingerprint Lock Narrow Frame Glass Aluminum Alloy Sliding Door APP Remote Networking Smart Lock","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Wholesale Digital Keyless Entry Ttlock APP Control Handle Fingerprint Electronic IC Card Passcode Smart Door Lock for Home","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Volibel Security Electronic Handle Digital Ttlock Fingerprint Tuya Wifi Smart Door Lock With Camera Cerraduras Inteligentes","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Smart Home WIFI Tuya APP Cat Eye 5050 Mortise Aluminum Smart Lock With Camera Video 8 Languages","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Volibel Smart Home Aluminum Alloy Cat Eyes Tuya App Wifi Electronic Smart Fingerprint Door Lock With Camera","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Factory OEM High Security Rfid Card Password Code Electric Digital Smart Door Lock Fingerprint Tuya Ttlock App","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Keyless Entry Smart Door Lock Tuya App for Fingerprint Password Card Key Unlock Cloud Storage IP65 Waterproof for Steel","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Volibel High Quality Biometric Fingerprint Password Narrow Gate Digital Tuya Smart Door Lock With Camera","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Smart Video Cat Eye APP Tuya WIFI Tempered Glass Screen Muti-Language 5050 Mortise Smart Door Lock With Camera","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"High Discount Low Price Excellent Quality Smart Lock Tuya Wifi Fingerprint Password Card Remote Unlock Smart Lock","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Factory Direct 6068 Mortise Fingerprint Password Screen Rfid Card Key Tuya APP WIFI Smart Door Lock With Camera HD","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Deftun 3585 Mortise Ttlock App Blue-Tooth Remote Unlock Aluminum Sliding Smart Door Lock for Wooden Door","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Security Aluminum Iron Alloy Automatic Biometric Fingerprint Tuya 3D Face Recognition WiFi Smart Door Lock Camera for Wood Door","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Deftun Stainless Steel Tuya App Fingerprint Smart Ball Lock for Smart Door Lock for Wood Door Room Office Home Apartment","imp":1,"clk":0,"ctr":0,"vis":0,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Security Tuya Smart Battery Powered Two-way Intercom Wireless 200W 1080P Wifi Water Resistant Video Door Phone","imp":1,"clk":0,"ctr":0,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Factory Direct Handleless Fingerprint Password Remote Control Waterproof Hotel Electronic Tuya Wifi Smart Door Lock","imp":0,"clk":0,"ctr":0,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Navicat High Quality Keyless App Digital Padlock Password Card Lock Ttlock Tuya Smart Padlock","imp":0,"clk":0,"ctr":0,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"High Quality Aluminium Intelligent Door Lock Waterproof Fingerprint Biometric Digital Lock for Sliding Door","imp":0,"clk":0,"ctr":0,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"潜力优品","name":"Smart Door Lock Automatic Face Recognition Sliding Lock Wifi App Remote Unlock Capture Photo Door Lock with Camera","imp":0,"clk":0,"ctr":0,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Hot Sale Smart Home 6068 Mortise Fingerprint Tuya APP WIFI Eye Cat Screen Smart Door Lock With Camera","imp":0,"clk":0,"ctr":0,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"Smart Home 3d Face Recognition Tuya App 6068 Mortise Facial Scan Fingerprint Wifi Smart Door Lock With Camera","imp":0,"clk":0,"ctr":0,"vis":2,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null},{"id":"","stage":"普通品","name":"2025 New Ttlock Smart Steel Lock Aluminum Alloy Tempered Glass Digital Electronic Remote Unlock Fingerprint Cloud Memory Card","imp":0,"clk":0,"ctr":0,"vis":1,"inq":0,"inqB":0,"tm":0,"leadsDay":0,"leads":0,"ords":0,"gmv":null,"p4pImp":0,"p4pClk":0,"p4pSpend":0,"qztImp":0,"qztClk":0,"qztSpend":0,"health":null}],"countries":[{"region":"United States","uv":92.0,"imps":2648.0,"biz":3.0},{"region":"Saudi Arabia","uv":75.0,"imps":854.0,"biz":12.0},{"region":"United Kingdom","uv":53.0,"imps":659.0,"biz":4.0},{"region":"India","uv":45.0,"imps":1341.0,"biz":2.0},{"region":"Colombia","uv":44.0,"imps":361.0,"biz":2.0},{"region":"Morocco","uv":41.0,"imps":293.0,"biz":2.0},{"region":"France","uv":39.0,"imps":781.0,"biz":4.0},{"region":"Argentina","uv":36.0,"imps":730.0,"biz":0.0},{"region":"Brazil","uv":31.0,"imps":864.0,"biz":1.0},{"region":"Georgia","uv":30.0,"imps":448.0,"biz":0.0},{"region":"Cote D'Ivoire","uv":29.0,"imps":312.0,"biz":2.0},{"region":"Nigeria","uv":26.0,"imps":507.0,"biz":0.0},{"region":"Vietnam","uv":25.0,"imps":868.0,"biz":1.0},{"region":"Egypt","uv":24.0,"imps":379.0,"biz":5.0},{"region":"Italy","uv":23.0,"imps":527.0,"biz":3.0},{"region":"Germany","uv":22.0,"imps":476.0,"biz":1.0},{"region":"Spain","uv":22.0,"imps":398.0,"biz":2.0},{"region":"Thailand","uv":20.0,"imps":328.0,"biz":0.0},{"region":"Senegal","uv":18.0,"imps":105.0,"biz":2.0},{"region":"Australia","uv":16.0,"imps":862.0,"biz":0.0},{"region":"Canada","uv":15.0,"imps":630.0,"biz":0.0},{"region":"Pakistan","uv":14.0,"imps":329.0,"biz":1.0},{"region":"Mexico","uv":14.0,"imps":319.0,"biz":1.0},{"region":"Israel","uv":14.0,"imps":316.0,"biz":2.0},{"region":"Ghana","uv":14.0,"imps":147.0,"biz":2.0},{"region":"Malaysia","uv":13.0,"imps":205.0,"biz":1.0},{"region":"South Africa","uv":13.0,"imps":186.0,"biz":2.0},{"region":"Venezuela","uv":12.0,"imps":246.0,"biz":0.0},{"region":"Maldives","uv":12.0,"imps":105.0,"biz":2.0},{"region":"Indonesia","uv":11.0,"imps":266.0,"biz":1.0},{"region":"Hong Kong","uv":11.0,"imps":254.0,"biz":0.0},{"region":"Dominican Republic","uv":11.0,"imps":238.0,"biz":0.0},{"region":"Kenya","uv":11.0,"imps":195.0,"biz":3.0},{"region":"Cambodia","uv":11.0,"imps":108.0,"biz":0.0},{"region":"Chile","uv":10.0,"imps":281.0,"biz":0.0},{"region":"Iraq","uv":10.0,"imps":230.0,"biz":1.0},{"region":"Peru","uv":10.0,"imps":221.0,"biz":2.0},{"region":"Ecuador","uv":10.0,"imps":213.0,"biz":1.0},{"region":"Philippines","uv":10.0,"imps":149.0,"biz":3.0},{"region":"Guinea","uv":10.0,"imps":70.0,"biz":1.0},{"region":"Turkey","uv":9.0,"imps":306.0,"biz":2.0},{"region":"Singapore","uv":9.0,"imps":207.0,"biz":0.0},{"region":"Tanzania","uv":9.0,"imps":137.0,"biz":0.0},{"region":"Nepal","uv":9.0,"imps":67.0,"biz":1.0},{"region":"Portugal","uv":9.0,"imps":58.0,"biz":0.0},{"region":"Chad","uv":9.0,"imps":53.0,"biz":1.0},{"region":"United Arab Emirates","uv":8.0,"imps":310.0,"biz":0.0},{"region":"South Korea","uv":8.0,"imps":287.0,"biz":0.0},{"region":"Netherlands","uv":8.0,"imps":238.0,"biz":0.0},{"region":"Bangladesh","uv":8.0,"imps":218.0,"biz":0.0},{"region":"Poland","uv":8.0,"imps":187.0,"biz":0.0},{"region":"Mali","uv":8.0,"imps":83.0,"biz":2.0},{"region":"Romania","uv":8.0,"imps":78.0,"biz":1.0},{"region":"Bolivia","uv":7.0,"imps":177.0,"biz":1.0},{"region":"Kazakhstan","uv":7.0,"imps":161.0,"biz":1.0},{"region":"Cameroon","uv":7.0,"imps":144.0,"biz":0.0},{"region":"Oman","uv":7.0,"imps":137.0,"biz":1.0},{"region":"Mozambique","uv":7.0,"imps":126.0,"biz":0.0},{"region":"Algeria","uv":7.0,"imps":123.0,"biz":1.0},{"region":"Belgium","uv":7.0,"imps":95.0,"biz":1.0},{"region":"Mongolia","uv":7.0,"imps":51.0,"biz":3.0},{"region":"Azerbaijan","uv":7.0,"imps":25.0,"biz":0.0},{"region":"Finland","uv":6.0,"imps":132.0,"biz":0.0},{"region":"Trinidad and Tobago","uv":6.0,"imps":73.0,"biz":1.0},{"region":"Burkina Faso","uv":6.0,"imps":64.0,"biz":2.0},{"region":"The former Yugoslav Republic of Macedonia","uv":6.0,"imps":17.0,"biz":1.0},{"region":"The Democratic Republic of the Congo","uv":5.0,"imps":208.0,"biz":1.0},{"region":"Sri Lanka","uv":5.0,"imps":110.0,"biz":0.0},{"region":"Somalia","uv":5.0,"imps":54.0,"biz":0.0},{"region":"Uzbekistan","uv":5.0,"imps":42.0,"biz":1.0},{"region":"Czech Republic","uv":4.0,"imps":87.0,"biz":0.0},{"region":"Ukraine","uv":4.0,"imps":84.0,"biz":0.0},{"region":"Myanmar","uv":4.0,"imps":67.0,"biz":0.0},{"region":"Congo","uv":4.0,"imps":54.0,"biz":1.0},{"region":"Panama","uv":4.0,"imps":42.0,"biz":0.0},{"region":"Niger","uv":4.0,"imps":38.0,"biz":0.0},{"region":"Russian Federation","uv":4.0,"imps":9.0,"biz":0.0},{"region":"Japan","uv":3.0,"imps":162.0,"biz":0.0},{"region":"Jamaica","uv":3.0,"imps":119.0,"biz":1.0},{"region":"Switzerland","uv":3.0,"imps":110.0,"biz":0.0},{"region":"Uruguay","uv":3.0,"imps":104.0,"biz":1.0},{"region":"Jordan","uv":3.0,"imps":93.0,"biz":1.0},{"region":"Benin","uv":3.0,"imps":93.0,"biz":0.0},{"region":"Zimbabwe","uv":3.0,"imps":73.0,"biz":0.0},{"region":"Hungary","uv":3.0,"imps":72.0,"biz":0.0},{"region":"Sweden","uv":3.0,"imps":66.0,"biz":0.0},{"region":"Qatar","uv":3.0,"imps":61.0,"biz":0.0},{"region":"Libyan Arab Jamahiriya","uv":3.0,"imps":54.0,"biz":0.0},{"region":"Norway","uv":3.0,"imps":30.0,"biz":0.0},{"region":"Honduras","uv":3.0,"imps":29.0,"biz":0.0},{"region":"Sierra Leone","uv":3.0,"imps":24.0,"biz":1.0},{"region":"Iran (Islamic Republic of)","uv":2.0,"imps":193.0,"biz":0.0},{"region":"Bulgaria","uv":2.0,"imps":158.0,"biz":0.0},{"region":"Kuwait","uv":2.0,"imps":130.0,"biz":0.0},{"region":"Yemen","uv":2.0,"imps":98.0,"biz":0.0},{"region":"New Zealand","uv":2.0,"imps":81.0,"biz":0.0},{"region":"Angola","uv":2.0,"imps":59.0,"biz":0.0},{"region":"Slovenia","uv":2.0,"imps":43.0,"biz":0.0},{"region":"Liberia","uv":2.0,"imps":39.0,"biz":0.0},{"region":"Puerto Rico","uv":2.0,"imps":38.0,"biz":0.0},{"region":"Zambia","uv":2.0,"imps":36.0,"biz":0.0},{"region":"Syrian Arab Republic","uv":2.0,"imps":36.0,"biz":0.0},{"region":"Other","uv":2.0,"imps":34.0,"biz":0.0},{"region":"Armenia","uv":2.0,"imps":32.0,"biz":0.0},{"region":"Lithuania","uv":2.0,"imps":30.0,"biz":0.0},{"region":"Uganda","uv":2.0,"imps":28.0,"biz":0.0},{"region":"Albania","uv":2.0,"imps":27.0,"biz":1.0},{"region":"Martinique","uv":2.0,"imps":21.0,"biz":0.0},{"region":"Reunion","uv":2.0,"imps":20.0,"biz":0.0},{"region":"Malawi","uv":2.0,"imps":12.0,"biz":0.0},{"region":"Botswana","uv":2.0,"imps":6.0,"biz":0.0},{"region":"Lesotho","uv":2.0,"imps":2.0,"biz":1.0},{"region":"Austria","uv":1.0,"imps":83.0,"biz":0.0},{"region":"Denmark","uv":1.0,"imps":81.0,"biz":0.0},{"region":"Togo","uv":1.0,"imps":79.0,"biz":0.0},{"region":"Palestine","uv":1.0,"imps":70.0,"biz":0.0},{"region":"Kyrgyzstan","uv":1.0,"imps":70.0,"biz":0.0},{"region":"Bosnia and Herzegovina","uv":1.0,"imps":64.0,"biz":0.0},{"region":"Guatemala","uv":1.0,"imps":61.0,"biz":0.0},{"region":"Taiwan","uv":1.0,"imps":47.0,"biz":0.0},{"region":"Croatia (local name: Hrvatska)","uv":1.0,"imps":44.0,"biz":0.0},{"region":"Costa Rica","uv":1.0,"imps":44.0,"biz":0.0},{"region":"Paraguay","uv":1.0,"imps":30.0,"biz":0.0},{"region":"Tunisia","uv":1.0,"imps":28.0,"biz":0.0},{"region":"Latvia","uv":1.0,"imps":28.0,"biz":0.0},{"region":"Belize","uv":1.0,"imps":26.0,"biz":0.0},{"region":"Belarus","uv":1.0,"imps":23.0,"biz":0.0},{"region":"Afghanistan","uv":1.0,"imps":21.0,"biz":0.0},{"region":"Gambia","uv":1.0,"imps":19.0,"biz":0.0},{"region":"Brunei Darussalam","uv":1.0,"imps":19.0,"biz":0.0},{"region":"Madagascar","uv":1.0,"imps":15.0,"biz":0.0},{"region":"Papua New Guinea","uv":1.0,"imps":14.0,"biz":1.0},{"region":"Bahamas","uv":1.0,"imps":14.0,"biz":0.0},{"region":"Slovakia (Slovak Republic)","uv":1.0,"imps":13.0,"biz":0.0},{"region":"Rwanda","uv":1.0,"imps":13.0,"biz":0.0},{"region":"Fiji","uv":1.0,"imps":12.0,"biz":0.0},{"region":"Haiti","uv":1.0,"imps":11.0,"biz":0.0},{"region":"Mauritania","uv":1.0,"imps":7.0,"biz":0.0},{"region":"Suriname","uv":1.0,"imps":6.0,"biz":0.0},{"region":"Lao People's Democratic Republic","uv":1.0,"imps":6.0,"biz":0.0},{"region":"Andorra","uv":1.0,"imps":6.0,"biz":0.0},{"region":"Guinea-Bissau","uv":1.0,"imps":5.0,"biz":0.0},{"region":"Mauritius","uv":1.0,"imps":4.0,"biz":0.0},{"region":"Guyana","uv":1.0,"imps":3.0,"biz":0.0},{"region":"Central African Republic","uv":1.0,"imps":3.0,"biz":0.0},{"region":"Cape Verde","uv":1.0,"imps":0.0,"biz":0.0},{"region":"Lebanon","uv":0.0,"imps":108.0,"biz":0.0},{"region":"Greece","uv":0.0,"imps":99.0,"biz":0.0},{"region":"Cyprus","uv":0.0,"imps":55.0,"biz":0.0},{"region":"Ethiopia","uv":0.0,"imps":46.0,"biz":0.0},{"region":"Ireland","uv":0.0,"imps":39.0,"biz":0.0},{"region":"SERBIA","uv":0.0,"imps":30.0,"biz":0.0},{"region":"Estonia","uv":0.0,"imps":23.0,"biz":0.0},{"region":"MONTENEGRO","uv":0.0,"imps":19.0,"biz":0.0},{"region":"Seychelles","uv":0.0,"imps":17.0,"biz":0.0},{"region":"El Salvador","uv":0.0,"imps":17.0,"biz":0.0},{"region":"Tajikistan","uv":0.0,"imps":16.0,"biz":0.0},{"region":"Saint Lucia","uv":0.0,"imps":15.0,"biz":0.0},{"region":"South Sudan","uv":0.0,"imps":13.0,"biz":0.0},{"region":"Bahrain","uv":0.0,"imps":13.0,"biz":0.0},{"region":"Malta","uv":0.0,"imps":12.0,"biz":0.0},{"region":"Luxembourg","uv":0.0,"imps":12.0,"biz":0.0},{"region":"New Caledonia","uv":0.0,"imps":10.0,"biz":0.0},{"region":"Moldova","uv":0.0,"imps":10.0,"biz":0.0},{"region":"Iceland","uv":0.0,"imps":10.0,"biz":0.0},{"region":"French Polynesia","uv":0.0,"imps":10.0,"biz":0.0},{"region":"Curacao","uv":0.0,"imps":10.0,"biz":0.0},{"region":"Cayman Islands","uv":0.0,"imps":9.0,"biz":0.0},{"region":"Burundi","uv":0.0,"imps":8.0,"biz":0.0},{"region":"Guadeloupe","uv":0.0,"imps":6.0,"biz":0.0},{"region":"Kiribati","uv":0.0,"imps":5.0,"biz":0.0},{"region":"Guam","uv":0.0,"imps":5.0,"biz":0.0},{"region":"Sudan","uv":0.0,"imps":4.0,"biz":0.0},{"region":"Nicaragua","uv":0.0,"imps":4.0,"biz":0.0},{"region":"Mayotte","uv":0.0,"imps":4.0,"biz":0.0},{"region":"Gabon","uv":0.0,"imps":4.0,"biz":0.0},{"region":"Barbados","uv":0.0,"imps":4.0,"biz":0.0},{"region":"Grenada","uv":0.0,"imps":3.0,"biz":0.0},{"region":"Turks and Caicos Islands","uv":0.0,"imps":2.0,"biz":0.0},{"region":"Sint Maarten","uv":0.0,"imps":2.0,"biz":0.0},{"region":"Djibouti","uv":0.0,"imps":2.0,"biz":0.0},{"region":"Comoros","uv":0.0,"imps":2.0,"biz":0.0},{"region":"Bhutan","uv":0.0,"imps":2.0,"biz":0.0},{"region":"Aruba","uv":0.0,"imps":2.0,"biz":0.0},{"region":"Samoa","uv":0.0,"imps":1.0,"biz":0.0},{"region":"Greenland","uv":0.0,"imps":1.0,"biz":0.0},{"region":"Antigua and Barbuda","uv":0.0,"imps":1.0,"biz":0.0}],"layers":[{"stage":"普通品","count":82,"ratio":65.08,"avgVis":0.22,"avgLeads30d":0.26},{"stage":"潜力优品","count":39,"ratio":30.95,"avgVis":0.33,"avgLeads30d":1.38},{"stage":"优品","count":3,"ratio":2.38,"avgVis":0,"avgLeads30d":4},{"stage":"低质品","count":2,"ratio":1.59,"avgVis":0.5,"avgLeads30d":0}],"period":{"start":"2026-08-12","endExclusive":"2026-11-09","visitors":1309,"inquiryBuyers":25,"tmBuyers":419,"inquiries":27,"leads":437,"orders":23,"gmv":null,"v2l":0.1089,"v2o":0.0068},"ad":{"wholeSite":{"window":"2026-11-03~2026-11-09","impressions":84,"clicks":3,"cost":0.0,"inquiries":0,"tm":0,"leads":0,"orders":0,"note":"全站推账户日汇总报告在该窗口仅返回 1 行"},"standardPush":{"rows":0,"window":"2026-08-12~2026-11-09","note":"标准推账户报告与计划级报告均返回 0 行，近 90 天无投放数据"},"plansWholeSite":[{"id":"","name":"全站推_省心版_20260326004125","status":"已暂停","budget":3500,"products":143},{"id":"","name":"潜力成长 20250108","status":"投放中(预算花完/账户冻结)","budget":150,"products":13},{"id":"","name":"M1 pro","status":"已暂停","budget":180,"products":1},{"id":"","name":"优品0403-K9爆品","status":"已暂停","budget":180,"products":1}],"plansSearch":[{"id":"","name":"提升L3-不花钱","status":"投放中(预算花完/账户冻结)","budget":50,"products":175},{"id":"","name":"F7pro单推-20250516","status":"投放中(预算花完/账户冻结)","budget":60,"products":0},{"id":"","name":"K9单推-20250501","status":"投放中(预算花完/账户冻结)","budget":50,"products":0},{"id":"","name":"新品-20250108","status":"投放中(预算花完/账户冻结)","budget":50,"products":0}],"searchPlanTotal":38,"wholeSitePlanTotal":4}};
+/* ================= 直通车 & 店铺经营数据大屏 · 逻辑层 ================= */
+const META = DATA.meta;
+const DAILY = DATA.daily;
+const CHAN = DATA.channels;
+const PROD = DATA.products;
+const CTRY = DATA.countries;
+const LAYERS = DATA.layers;
+const PERIOD = DATA.period || {};
+const AD = DATA.ad;
+
+const PUBLIC = !!(META && META.public);
+const MIN_D = META.start, MAX_D = META.end;
+const MASK = '已脱敏';
+let S = MIN_D, E = MAX_D;
+
+/* ---------- helpers ---------- */
+const el = (id) => document.getElementById(id);
+const n0 = (v) => (v === null || v === undefined || isNaN(v)) ? '—' : Math.round(v).toLocaleString('en-US');
+const n1 = (v) => (v === null || v === undefined || isNaN(v)) ? '—' : Number(v).toLocaleString('en-US', {minimumFractionDigits:1, maximumFractionDigits:1});
+const n2 = (v) => (v === null || v === undefined || isNaN(v)) ? '—' : Number(v).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+const pc = (v, d = 1) => (v === null || v === undefined || isNaN(v)) ? '—' : (v * 100).toFixed(d) + '%';
+const sum = (rows, k) => rows.reduce((a, r) => a + (Number(r[k]) || 0), 0);
+const div = (a, b) => (b ? a / b : null);
+const dayDiff = (a, b) => Math.round((new Date(b) - new Date(a)) / 86400000) + 1;
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function rowsIn(s, e) { return DAILY.filter(r => r.d >= s && r.d <= e); }
+
+function agg(s, e) {
+  const rows = rowsIn(s, e);
+  const a = {};
+  ['vis', 'exp', 'clk', 'sexp', 'sclk', 'p4pImp', 'p4pClk', 'qztImp', 'qztClk', 'campImp', 'campClk',
+    'inq', 'inqB', 'tmB', 'leads', 'ords', 'gmv'].forEach(k => a[k] = sum(rows, k));
+  a.days = rows.length;
+  a.paidClk = a.p4pClk + a.qztClk;
+  a.natClk = Math.max(a.clk - a.paidClk, 0);
+  a.paidImp = a.p4pImp + a.qztImp;
+  a.ctr = div(a.clk, a.exp);
+  a.l2v = div(a.vis, a.clk);
+  a.v2l = div(a.leads, a.vis);
+  a.last = rows.length ? rows[rows.length - 1] : null;
+  return a;
+}
+
+/* ================= 1. KPI ================= */
+function renderKPI() {
+  const a = agg(S, E);
+  const last = a.last;
+  const cards = [
+    { k: '访客人数', v: n0(a.vis), u: '人', n: '<b>日累计</b>，非区间去重', c: 'c-cyan' },
+    { k: '曝光次数', v: n0(a.exp), u: '次', n: '搜索曝光 ' + n0(a.sexp), c: 'c-blue' },
+    { k: '总点击', v: n0(a.clk), u: '次', n: '点击率 ' + pc(a.ctr, 2), c: 'c-violet' },
+    { k: '直通车点击', v: n0(a.paidClk), u: '次', n: a.paidClk === 0 ? '<span class="badge b-bad">区间无付费点击</span>' : '全站推 ' + n0(a.qztClk) + ' / 标准推 ' + n0(a.p4pClk), c: a.paidClk ? 'c-amber' : 'c-red' },
+    { k: '自然点击', v: n0(a.natClk), u: '次', n: '总点击 − 付费点击（计算值）', c: 'c-green' },
+    { k: '询盘数 / 询盘人数', v: n0(a.inq), u: '个', n: '询盘人数 <b>' + n0(a.inqB) + '</b>（日累计）', c: 'c-pink' },
+    { k: 'TM 咨询人数', v: n0(a.tmB), u: '人', n: '日累计，非区间去重', c: 'c-blue' },
+    { k: '及时回复率', v: last && last.r5 != null ? pc(last.r5, 2) : '—', u: '', n: '截至 ' + (last ? last.d : '—') + ' 当日值', c: (last && last.r5 >= 0.8) ? 'c-green' : 'c-amber' },
+    { k: '平均回复时长', v: last && last.replySec != null ? Math.round(last.replySec) : '—', u: '秒', n: '≈ ' + (last && last.replySec ? (last.replySec / 60).toFixed(1) : '—') + ' 分钟（当日）', c: 'c-amber' },
+    { k: '商机量', v: n0(a.leads), u: '个', n: '商机/访客 ' + pc(a.v2l, 2) + '（计算值）', c: 'c-green' },
+    { k: '订单数', v: n0(a.ords), u: '笔', n: PUBLIC ? 'GMV ' + MASK : 'GMV $' + n0(a.gmv), c: 'c-violet' },
+    { k: '广告消耗', v: '¥0', u: '', n: '<span class="badge b-bad">全站推 + 标准推 = 0</span>', c: 'c-red' }
+  ];
+  el('kpi-grid').innerHTML = cards.map(c => `<div class="card kpi">
+    <div class="k">${c.k}</div>
+    <div class="v ${c.c}">${c.v}<span class="u">${c.u}</span></div>
+    <div class="n">${c.n}</div></div>`).join('');
+
+  el('ov-sub').textContent = `${S} ~ ${E} · ${a.days} 个自然日 · 最新完整日 ${META.end}`;
+  el('trend-tag').textContent = a.days + ' 天';
+
+  /* funnel */
+  const rates = [
+    { l: '曝光 → 点击', v: div(a.clk, a.exp) },
+    { l: '点击 → 访客', v: div(a.vis, a.clk) },
+    { l: '访客 → 商机', v: a.v2l },
+    { l: '商机 → 订单', v: div(a.ords, a.leads) }
+  ];
+  const steps = [
+    { l: '曝光', v: a.exp, c: '#3b82f6' }, { l: '点击', v: a.clk, c: '#8b5cf6' },
+    { l: '访客', v: a.vis, c: '#22d3ee' }, { l: '商机', v: a.leads, c: '#34d399' },
+    { l: '订单', v: a.ords, c: '#fbbf24' }
+  ];
+  const mx = Math.max(...steps.map(s => s.v), 1);
+  el('funnel').innerHTML = steps.map((s, i) => `
+    <div style="margin-bottom:9px">
+      <div style="display:flex;justify-content:space-between;font-size:11.5px;color:#8fa3bf;margin-bottom:3px">
+        <span>${s.l}</span><span class="mono" style="color:#e8eef8;font-weight:600">${n0(s.v)}</span></div>
+      <div style="height:8px;background:rgba(36,57,90,.55);border-radius:4px;overflow:hidden">
+        <div style="width:${Math.max(s.v / mx * 100, s.v ? 2 : 0)}%;height:100%;background:${s.c};border-radius:4px"></div></div>
+      ${i < rates.length ? `<div style="font-size:10.5px;color:#63799a;margin-top:2px">↓ ${rates[i].l} ${pc(rates[i].v, 2)}</div>` : ''}
+    </div>`).join('');
+}
+
+/* ================= charts ================= */
+function drawTrend() {
+  const rows = rowsIn(S, E);
+  const host = el('chart-trend');
+  if (rows.length < 2) { host.innerHTML = '<div class="empty">区间过短，暂无趋势线（请选择 ≥2 天）</div>'; return; }
+  const W = 900, H = 260, P = { l: 46, r: 46, t: 14, b: 26 };
+  const iw = W - P.l - P.r, ih = H - P.t - P.b;
+  const maxV = Math.max(...rows.map(r => r.vis), 1);
+  const maxC = Math.max(...rows.map(r => r.clk), 1);
+  const x = i => P.l + (rows.length === 1 ? iw / 2 : i * iw / (rows.length - 1));
+  const yv = v => P.t + ih - (v / maxV) * ih;
+  const yc = v => P.t + ih - (v / maxC) * ih;
+  const line = (k, fn) => rows.map((r, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${fn(r[k]).toFixed(1)}`).join(' ');
+  const area = (k, fn) => `${line(k, fn)} L${x(rows.length - 1)},${P.t + ih} L${P.l},${P.t + ih} Z`;
+  let grid = '', ticks = 4;
+  for (let i = 0; i <= ticks; i++) {
+    const y = P.t + ih * i / ticks;
+    grid += `<line class="gridline" x1="${P.l}" y1="${y}" x2="${W - P.r}" y2="${y}"/>`;
+    grid += `<text class="axis" x="${P.l - 8}" y="${y + 3}" text-anchor="end">${Math.round(maxV * (1 - i / ticks))}</text>`;
+    grid += `<text class="axis" x="${W - P.r + 8}" y="${y + 3}" text-anchor="start">${Math.round(maxC * (1 - i / ticks))}</text>`;
+  }
+  const step = Math.max(Math.ceil(rows.length / 8), 1);
+  let xl = '';
+  rows.forEach((r, i) => { if (i % step === 0 || i === rows.length - 1) xl += `<text class="axis" x="${x(i)}" y="${H - 8}" text-anchor="middle">${r.d.slice(5)}</text>`; });
+  const dots = rows.map((r, i) => `<circle cx="${x(i)}" cy="${yv(r.vis)}" r="2" fill="#22d3ee" opacity=".85"/><title>${r.d} 访客 ${n0(r.vis)} / 点击 ${n0(r.clk)} / 商机 ${n0(r.leads)}</title>`).join('');
+  host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">
+    <defs><linearGradient id="gv" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#22d3ee" stop-opacity=".28"/><stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/></linearGradient></defs>
+    ${grid}
+    <path d="${area('vis', yv)}" fill="url(#gv)"/>
+    <path d="${line('vis', yv)}" fill="none" stroke="#22d3ee" stroke-width="2"/>
+    <path d="${line('clk', yc)}" fill="none" stroke="#8b5cf6" stroke-width="1.8" opacity=".95"/>
+    ${dots}${xl}</svg>`;
+}
+
+function drawWeek() {
+  const map = new Map();
+  rowsIn(S, E).forEach(r => {
+    const d = new Date(r.d + 'T00:00:00');
+    const dow = (d.getDay() + 6) % 7;
+    const mon = addDays(r.d, -dow);
+    const from = mon < S ? S : mon;
+    if (!map.has(mon)) map.set(mon, { from: from, to: r.d, spend: 0, clk: 0, leads: 0, exp: 0, inq: 0, ords: 0, gmv: 0, p4p: 0 });
+    const w = map.get(mon);
+    w.to = r.d; w.spend += 0; w.clk += r.clk; w.leads += r.leads; w.exp += r.exp;
+    w.inq += r.inq; w.ords += r.ords; w.gmv += r.gmv; w.p4p += r.p4pClk + r.qztClk;
+  });
+  const weeks = [...map.values()];
+  el('week-rows').innerHTML = weeks.map(w => `<tr>
+    <td class="l mono">${w.from.slice(5)} ~ ${w.to.slice(5)}</td>
+    <td class="${w.spend ? '' : 'zero'}">${w.spend ? n2(w.spend) : '0.00'}</td>
+    <td>${n0(w.exp)}</td><td>${n0(w.clk)}</td><td>${n0(w.inq)}</td>
+    <td>${n0(w.leads)}</td><td>${n0(w.ords)}</td><td>${PUBLIC ? '—' : n0(w.gmv)}</td></tr>`).join('')
+    || '<tr><td colspan="8" class="empty">区间无数据</td></tr>';
+
+  const host = el('chart-week');
+  if (!weeks.length) { host.innerHTML = '<div class="empty">区间无数据</div>'; return; }
+  const W = 900, H = 250, P = { l: 44, r: 44, t: 16, b: 40 };
+  const iw = W - P.l - P.r, ih = H - P.t - P.b;
+  const maxA = Math.max(...weeks.map(w => w.clk), 1);
+  const maxB = Math.max(...weeks.map(w => w.leads), 1);
+  const bw = Math.min(iw / weeks.length * 0.32, 34);
+  const cx = i => P.l + iw * (i + 0.5) / weeks.length;
+  let bars = '', lbl = '', grid = '';
+  for (let i = 0; i <= 4; i++) {
+    const y = P.t + ih * i / 4;
+    grid += `<line class="gridline" x1="${P.l}" y1="${y}" x2="${W - P.r}" y2="${y}"/>`;
+    grid += `<text class="axis" x="${P.l - 8}" y="${y + 3}" text-anchor="end">${Math.round(maxA * (1 - i / 4))}</text>`;
+    grid += `<text class="axis" x="${W - P.r + 8}" y="${y + 3}" text-anchor="start">${Math.round(maxB * (1 - i / 4))}</text>`;
+  }
+  weeks.forEach((w, i) => {
+    const h1 = w.clk / maxA * ih, h2 = w.leads / maxB * ih;
+    bars += `<rect x="${cx(i) - bw - 2}" y="${P.t + ih - h1}" width="${bw}" height="${Math.max(h1, 1)}" rx="2" fill="#3b82f6" opacity=".85"><title>${w.from} 周 点击 ${n0(w.clk)}</title></rect>`;
+    bars += `<rect x="${cx(i) + 2}" y="${P.t + ih - h2}" width="${bw}" height="${Math.max(h2, 1)}" rx="2" fill="#34d399" opacity=".9"><title>${w.from} 周 商机 ${n0(w.leads)}</title></rect>`;
+    lbl += `<text class="axis" x="${cx(i)}" y="${H - 22}" text-anchor="middle">${w.from.slice(5)}</text>`;
+  });
+  host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${grid}${bars}
+    <line x1="${P.l}" y1="${P.t + ih}" x2="${W - P.r}" y2="${P.t + ih}" stroke="#24395a"/>
+    <text class="axis" x="${W / 2}" y="${H - 4}" text-anchor="middle" fill="#f87171">广告消耗：¥0（所选区间内全站推/标准推均无花费）</text>
+    ${lbl}</svg>`;
+}
+
+/* ================= 2. 直通车 ================= */
+function renderP4P() {
+  el('ws-tag').textContent = AD.wholeSite.window;
+  el('sr-tag').textContent = '近 90 天';
+  const ws = AD.wholeSite, sr = AD.standardPush;
+  const wsCtr = div(ws.clicks, ws.impressions);
+  el('ws-body').innerHTML = `
+    <div class="kv"><span>曝光量</span><b class="mono">${n0(ws.impressions)}</b></div>
+    <div class="kv"><span>点击量</span><b class="mono">${n0(ws.clicks)}</b></div>
+    <div class="kv"><span>点击率</span><b class="mono">${pc(wsCtr, 2)}</b></div>
+    <div class="kv"><span>花费</span><b class="mono c-red">¥${n2(ws.cost)}</b></div>
+    <div class="kv"><span>点击成本</span><b class="mono">${ws.clicks ? '¥' + n2(ws.cost / ws.clicks) : '—'}</b></div>
+    <div class="kv"><span>询盘量 / TM 咨询</span><b class="mono">${n0(ws.inquiries)} / ${n0(ws.tm)}</b></div>
+    <div class="kv"><span>全站商机量</span><b class="mono">${n0(ws.leads)}</b></div>
+    <div style="margin-top:9px;font-size:11.5px;color:#63799a">${esc(ws.note)}。样本仅 ${n0(ws.impressions)} 次曝光，点击率不具备判断意义。</div>`;
+  el('sr-body').innerHTML = `
+    <div class="kv"><span>账户报告行数</span><b class="mono c-red">${n0(sr.rows)}</b></div>
+    <div class="kv"><span>查询窗口</span><b class="mono">${esc(sr.window)}</b></div>
+    <div class="kv"><span>花费 / 曝光 / 点击</span><b class="mono">— / — / —</b></div>
+    <div class="kv"><span>关键词询盘归因</span><b class="mono">不可用</b></div>
+    <div style="margin-top:9px;font-size:11.5px;color:#63799a">${esc(sr.note)}。0 行表示上游成功返回但无事实数据，<b style="color:#f6b1b1">不等于</b>花费为 0 的猜测，而是"无投放记录"。</div>`;
+
+  const st = (s) => s.startsWith('投放中') ? '<span class="badge b-warn">投放中·预算花完/冻结</span>' : '<span class="badge b-idle">已暂停</span>';
+  el('ws-plans').innerHTML = AD.plansWholeSite.map(p => `<tr>
+    <td class="l"><span class="pname" title="${esc(p.name)}">${esc(p.name)}</span><span class="pid mono">${PUBLIC ? MASK : p.id}</span></td>
+    <td class="l">${st(p.status)}</td><td>¥${n0(p.budget)}</td><td>${n0(p.products)}</td></tr>`).join('');
+  el('sr-plans').innerHTML = AD.plansSearch.map(p => `<tr>
+    <td class="l"><span class="pname" title="${esc(p.name)}">${esc(p.name)}</span><span class="pid mono">${PUBLIC ? MASK : p.id}</span></td>
+    <td class="l">${st(p.status)}</td><td>¥${n0(p.budget)}</td><td>${n0(p.products)}</td></tr>`).join('');
+  el('sr-plan-count').textContent = `共 ${AD.searchPlanTotal} 个 · 在投 ${AD.plansSearch.length} 个`;
+
+  const a = agg(S, E);
+  el('p4p-alert').innerHTML = `<div class="notice bad"><span class="ic">!</span><div>
+    <b>直通车当前处于"停机"状态。</b>店铺侧近 ${a.days} 天 P4P 曝光 <b>${n0(a.p4pImp)}</b> 次、全站推曝光 <b>${n0(a.qztImp)}</b> 次，
+    广告接口查到的全站推近一周仅 <b>84 次曝光 / 3 次点击 / ¥0 花费</b>，标准推近 90 天 <b>0 行数据</b>。
+    4 个全站推计划中 3 个已暂停、1 个"预算花完/账户冻结"；标准推 4 个在投计划里 3 个在线商品数为 0。
+    结论：<b>不是投放效果差，而是没有在投放</b>——先查账户余额与预算，再谈优化。</div></div>`;
+}
+
+/* ================= 3. 渠道 ================= */
+const CH_MAP = { '搜索': '搜索', '系统推荐': '推荐', 'Top-Ranking Suppliers': '榜单', '店内': '店内', '直接访问': '直接访问', '站外': '站外' };
+const CH_COLORS = { '搜索': '#22d3ee', '推荐': '#3b82f6', '榜单': '#8b5cf6', '店内': '#34d399', '直接访问': '#fbbf24', '站外': '#f472b6', '其他': '#63799a' };
+
+function channelAgg() {
+  const rows = CHAN.filter(r => r.d >= S && r.d <= E);
+  const m = new Map();
+  rows.forEach(r => {
+    const g = CH_MAP[r.ch] || '其他';
+    if (!m.has(g)) m.set(g, { g, vis: 0, tmv: 0, inqv: 0, days: new Set(), sub: new Map() });
+    const o = m.get(g);
+    o.vis += r.vis; o.tmv += r.tmv; o.inqv += r.inqv; o.days.add(r.d);
+    if (g === '其他') o.sub.set(r.ch, (o.sub.get(r.ch) || 0) + r.vis);
+  });
+  const out = [...m.values()].map(o => ({
+    ...o, days: o.days.size,
+    subTxt: [...o.sub.entries()].sort((a, b) => b[1] - a[1]).map(([k, v]) => k + ' ' + n0(v)).join(' · ')
+  }));
+  out.sort((a, b) => b.vis - a.vis);
+  return out;
+}
+
+function renderChannels() {
+  const list = channelAgg();
+  const total = list.reduce((a, x) => a + x.vis, 0) || 1;
+  el('ch-count').textContent = `${S} ~ ${E} · 日累计`;
+  el('ch-rows').innerHTML = list.map(x => {
+    const conv = div(x.tmv + x.inqv, x.vis);
+    return `<tr title="${esc(x.subTxt)}">
+      <td class="l"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${CH_COLORS[x.g] || '#63799a'};margin-right:7px"></span>${esc(x.g)}</td>
+      <td>${n0(x.vis)}</td><td>${(x.vis / total * 100).toFixed(1)}%</td>
+      <td>${n0(x.tmv)}</td><td>${n0(x.inqv)}</td><td>${pc(conv, 2)}</td><td>${n0(x.days)}</td></tr>`;
+  }).join('') || '<tr><td colspan="7" class="empty">区间无渠道数据</td></tr>';
+
+  /* donut */
+  const R = 82, C = 2 * Math.PI * R;
+  let off = 0, arcs = '';
+  list.forEach(x => {
+    const frac = x.vis / total;
+    arcs += `<circle cx="110" cy="110" r="${R}" fill="none" stroke="${CH_COLORS[x.g] || '#63799a'}" stroke-width="26"
+      stroke-dasharray="${(frac * C).toFixed(2)} ${C.toFixed(2)}" stroke-dashoffset="${(-off * C).toFixed(2)}"
+      transform="rotate(-90 110 110)"><title>${esc(x.g)} ${n0(x.vis)} 人次 (${(frac * 100).toFixed(1)}%)</title></circle>`;
+    off += frac;
+  });
+  el('chart-pie').innerHTML = `<svg viewBox="0 0 220 220" style="max-width:260px;margin:0 auto">
+    ${arcs}<text x="110" y="104" text-anchor="middle" fill="#e8eef8" font-size="24" font-weight="700">${n0(total)}</text>
+    <text x="110" y="124" text-anchor="middle" fill="#63799a" font-size="11">渠道访客合计(日累计)</text></svg>`;
+  el('pie-legend').innerHTML = list.map(x =>
+    `<span style="width:100%;display:flex;justify-content:space-between;gap:8px">
+      <span><i style="background:${CH_COLORS[x.g] || '#63799a'}"></i>${esc(x.g)}</span>
+      <span class="mono" style="color:#8fa3bf">${(x.vis / total * 100).toFixed(1)}%</span></span>`).join('');
+}
+
+/* ================= 4. 商品 ================= */
+let ppSort = 'leads', ppQ = '', ppStage = '';
+function renderProducts() {
+  const stages = [...new Set(PROD.map(p => p.stage))];
+  const sel = el('pp-stage');
+  if (sel.options.length <= 1) stages.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sel.appendChild(o); });
+
+  let list = PROD.filter(p => (!ppStage || p.stage === ppStage) &&
+    (!ppQ || (p.name || '').toLowerCase().includes(ppQ) || (p.id || '').includes(ppQ)));
+  list.sort((a, b) => (b[ppSort] || 0) - (a[ppSort] || 0));
+  el('pp-cnt').textContent = `${list.length} / ${PROD.length} 个链接`;
+  el('pp-rows').innerHTML = list.map(p => `<tr>
+    <td class="l"><span class="pname" title="${esc(p.name)}">${esc(p.name) || '(无标题)'}</span>
+      <span class="pid mono">${PUBLIC ? MASK : (p.id || 'ID 未返回')}</span></td>
+    <td class="l"><span class="pill ${p.stage === '优品' ? 'g' : p.stage === '潜力优品' ? 'w' : p.stage === '低质品' ? 'r' : 'n'}">${esc(p.stage)}</span></td>
+    <td>${n0(p.imp)}</td><td>${n0(p.clk)}</td><td>${p.ctr == null ? '—' : pc(p.ctr, 2)}</td><td>${n0(p.vis)}</td>
+    <td>${n0(p.inq)}</td><td class="${p.leads ? '' : 'zero'}">${n0(p.leads)}</td><td>${n0(p.ords)}</td><td>${PUBLIC ? '—' : n0(p.gmv)}</td>
+    <td class="${p.p4pImp ? '' : 'zero'}">${n0(p.p4pImp)}</td>
+    <td class="${p.p4pClk ? '' : 'zero'}">${n0(p.p4pClk)}</td>
+    <td class="${p.p4pSpend ? '' : 'zero'}">${p.p4pSpend ? n2(p.p4pSpend) : '0.00'}</td></tr>`).join('')
+    || '<tr><td colspan="13" class="empty">无匹配商品</td></tr>';
+  const leads30 = PROD.reduce((a, p) => a + (p.leads || 0), 0);
+  const withLeads = PROD.filter(p => (p.leads || 0) > 0).length;
+  el('pp-sub').textContent = `快照日 ${META.snapshotDate} · 126/274 个链接 · 30天商机合计 ${n0(leads30)}（${withLeads} 个链接有值）`;
+}
+
+/* ================= 5. 商品结构 ================= */
+function renderLayers() {
+  const total = LAYERS.reduce((a, x) => a + x.count, 0) || 1;
+  const get = (s) => LAYERS.find(l => l.stage === s) || { count: 0, ratio: 0 };
+  const good = get('优品').count, pot = get('潜力优品').count, norm = get('普通品').count, low = get('低质品').count, hot = 0;
+  el('layer-sub').textContent = `快照日 ${META.snapshotDate} · 商品效果明细 prodLevel3 分层`;
+  el('layer-rows').innerHTML = LAYERS.map(l => `<tr>
+    <td class="l"><span class="pill ${l.stage === '优品' ? 'g' : l.stage === '潜力优品' ? 'w' : l.stage === '低质品' ? 'r' : 'n'}">${esc(l.stage)}</span></td>
+    <td>${n0(l.count)}</td><td>${l.ratio}%</td><td>${n1(l.avgVis)}</td><td>${n2(l.avgLeads30d)}</td></tr>`).join('');
+  const cards = [
+    { k: '优品数量', v: good, c: 'c-green', n: '占比 ' + (good / total * 100).toFixed(2) + '%' },
+    { k: '爆品数量', v: hot, c: 'c-red', n: '口径字段 top_product_count = 0' },
+    { k: '潜力优品', v: pot, c: 'c-amber', n: '占比 ' + (pot / total * 100).toFixed(1) + '%' },
+    { k: '普通品 + 低质品', v: norm + low, c: 'c-blue', n: '普通 ' + norm + ' + 低质 ' + low }
+  ];
+  el('layer-kpi').innerHTML = cards.map(c => `<div class="kv"><span>${c.k}</span>
+    <b class="mono ${c.c}" style="font-size:16px">${n0(c.v)} <span style="font-size:10.5px;color:#63799a;font-weight:400">${c.n}</span></b></div>`).join('');
+  /* mini stacked bar */
+  const segs = [['优品', good, '#34d399'], ['潜力优品', pot, '#fbbf24'], ['普通品', norm, '#3b82f6'], ['低质品', low, '#f87171']];
+  let x = 0, rects = '', labs = '';
+  segs.forEach(([nm, v, c]) => {
+    const w = v / total * 100;
+    if (v > 0) rects += `<rect x="${x}%" y="0" width="${w}%" height="20" fill="${c}"><title>${nm} ${v}</title></rect>`;
+    x += w;
+  });
+  el('chart-layer').innerHTML = `<svg viewBox="0 0 100 20" preserveAspectRatio="none" style="height:20px">${rects}</svg>
+    <div class="legend" style="margin-top:8px">${segs.map(([nm, v, c]) => `<span><i style="background:${c}"></i>${nm} ${v}</span>`).join('')}</div>`;
+}
+
+/* ================= 6. 国家 ================= */
+const NA = ['United States', 'Canada', 'Mexico'];
+const EU = ['United Kingdom', 'France', 'Germany', 'Italy', 'Spain', 'Netherlands', 'Belgium', 'Poland', 'Portugal',
+  'Romania', 'Czech Republic', 'Finland', 'Sweden', 'Switzerland', 'Norway', 'Denmark', 'Austria', 'Hungary',
+  'Slovenia', 'Lithuania', 'Latvia', 'Slovakia (Slovak Republic)', 'Croatia (local name: Hrvatska)', 'Bulgaria', 'Ireland', 'Greece'];
+function renderCountry() {
+  const withUv = CTRY.filter(c => c.uv > 0);
+  const totUv = withUv.reduce((a, c) => a + c.uv, 0) || 1;
+  const totBiz = withUv.reduce((a, c) => a + c.biz, 0);
+  const eu = withUv.filter(c => EU.includes(c.region));
+  const na = withUv.filter(c => NA.includes(c.region));
+  const sumOf = (arr, k) => arr.reduce((a, c) => a + c[k], 0);
+  const west = [...eu, ...na];
+  const wUv = sumOf(eu, 'uv') + sumOf(na, 'uv');
+  const wBiz = sumOf(eu, 'biz') + sumOf(na, 'biz');
+  const wImp = sumOf(eu, 'imps') + sumOf(na, 'imps');
+
+  el('region-cards').innerHTML = `
+    <div class="card kpi"><div class="k">欧美访客（欧洲+北美）</div>
+      <div class="v c-cyan">${n0(wUv)}<span class="u">人</span></div>
+      <div class="n">占全站访客 <b>${(wUv / totUv * 100).toFixed(1)}%</b> · 欧洲 ${n0(sumOf(eu, 'uv'))} / 北美 ${n0(sumOf(na, 'uv'))}</div></div>
+    <div class="card kpi"><div class="k">欧美商机量</div>
+      <div class="v c-green">${n0(wBiz)}<span class="u">个</span></div>
+      <div class="n">欧美商机/访客 <b>${pc(div(wBiz, wUv), 2)}</b> · 全站 ${pc(div(totBiz, totUv), 2)}</div></div>
+    <div class="card kpi"><div class="k">欧美商品曝光</div>
+      <div class="v c-blue">${n0(wImp)}<span class="u">次</span></div>
+      <div class="n">覆盖 ${west.length} 个国家/地区 · 近90天累计</div></div>`;
+
+  const topEu = [...eu].sort((a, b) => b.uv - a.uv).slice(0, 8);
+  const topNa = [...na].sort((a, b) => b.uv - a.uv);
+  const bars = [...topNa, ...topEu];
+  const mx = Math.max(...bars.map(b => b.uv), 1);
+  el('eu-bars').innerHTML = bars.map(c => `<div class="hrow">
+      <span class="nm" title="${esc(c.region)}">${esc(c.region)}</span>
+      <span class="track"><span class="fill" style="width:${Math.max(c.uv / mx * 100, 2)}%;${NA.includes(c.region) ? 'background:linear-gradient(90deg,#8b5cf6,#3b82f6)' : ''}"></span></span>
+      <span class="val mono">${n0(c.uv)}</span>
+      <span class="sub mono">商机 ${n0(c.biz)}</span></div>`).join('') || '<div class="empty">无欧美数据</div>';
+
+  el('ctry-rows').innerHTML = withUv.slice(0, 20).map(c => `<tr>
+    <td class="l">${esc(c.region)}</td><td>${n0(c.uv)}</td><td>${n0(c.imps)}</td><td>${n0(c.biz)}</td>
+    <td>${pc(div(c.biz, c.uv), 2)}</td></tr>`).join('');
+}
+
+/* ================= 7. 判断框架 ================= */
+function renderFramework() {
+  const a = agg(S, E);
+  const last = a.last || {};
+  const rows = [
+    ['钱有没有花出去？', '计划在线状态、日消耗、预算、账户余额、在线商品数',
+      '消耗=0 但状态是"预算花完/冻结"⇒ 先解决钱和设置，素材与关键词优化无效',
+      '<span class="pill r">消耗 ¥0</span><span class="pill r">3/4 全站推已暂停</span>'],
+    ['买来的量对不对？', '曝光量、点击率(CTR)、点击成本(CPC)、搜索词/关键词',
+      'CTR 低先看词与主图/标题是否匹配；CPC 高看竞争度与出价。对比基准取后台同类目参考值，不用经验值',
+      '<span class="pill w">84 曝光 / 3 点击</span><span class="pill n">样本过小不可判</span>'],
+    ['点击能不能变成人？', '点击→访客转化、访客→询盘/TM、商机转化率、单商机成本',
+      '广告点击不进入店铺访问说明落地页/主图承接有问题；商机成本高于订单毛利就停投',
+      '<span class="pill r">0 商机</span><span class="pill n">单商机成本 —</span>'],
+    ['钱花在哪个链接？', '商品级广告花费、该链接曝光/点击/询盘、健康分层',
+      '花费集中在无询盘链接 ⇒ 换品或停投；有询盘但无花费 ⇒ 加投。必须逐链接对照自然表现',
+      '<span class="pill r">126 个链接花费全为 0</span>'],
+    ['钱花在哪个国家？', '国家维度消耗、商机数、商机成本；欧美 vs 其他',
+      '高消耗低商机国家降价或排除；欧美商机成本可接受则单独加预算包',
+      '<span class="pill r">广告国家消耗数据不可得</span><span class="pill g">欧美访客占 ' + (CTRY.filter(c => c.uv > 0).reduce((s, c) => s + (EU.includes(c.region) || NA.includes(c.region) ? c.uv : 0), 0) / (CTRY.filter(c => c.uv > 0).reduce((s, c) => s + c.uv, 0) || 1) * 100).toFixed(1) + '%</span>'],
+    ['词和时段能不能控？', '关键词列表/出价/屏蔽词、推广时段、地域设置',
+      '要控词控成本→标准推；要省人力放量→全站推。全站推看不到词的转化，只能看曝光和点击率',
+      '<span class="pill w">标准推可看词，但当前 0 数据</span>'],
+    ['整体盘子健不健康？', '访客、商机量、商机/访客率、订单、GMV、及时回复率、平均回复时长',
+      '广告是放大器：自然转化率本身低时，加投放只会放大浪费。先修转化再放量',
+      '<span class="pill g">商机/访客 ' + pc(a.v2l, 2) + '</span><span class="pill w">5分钟回复率 ' + pc(last.r5, 2) + '</span><span class="pill n">平均回复 ' + (last.replySec ? Math.round(last.replySec) + ' 秒' : '—') + '</span>'],
+    ['商品结构撑不撑得住投放？', '优品率、爆品数、潜力优品数、低质品数',
+      '投放优先砸优品和爆品；优品太少时应该先做品，而不是先加预算',
+      '<span class="pill g">优品 3</span><span class="pill r">爆品 0</span><span class="pill w">潜力优品 39</span>']
+  ];
+  el('fw-rows').innerHTML = rows.map((r, i) => `<div class="fwi">
+    <div class="qt"><i>Q${i + 1}</i>${r[0]}</div>
+    <div class="ln"><b>看什么</b>${r[1]}</div>
+    <div class="ln"><b>怎么判断</b>${r[2]}</div>
+    <div class="res">${r[3]}</div></div>`).join('');
+
+  el('actions').innerHTML = [
+    ['1', '先查账户余额 / 预算 / 冻结状态', '4 个全站推计划 3 个已暂停、1 个状态为"预算花完或账户冻结"；标准推 4 个在投计划中 3 个在线商品数为 0。先修设置，再谈优化。', 'r'],
+    ['2', '用标准推做小预算关键词验证', '全站推看不到关键词转化，无法判断"钱到底花在哪个词上"。用标准推 ¥50–100/天跑 3–5 个高相关词，先拿到词级询盘数据。', 'w'],
+    ['3', '投放目标先锁优品/潜力优品', '本店优品仅 3 个、爆品 0 个、潜力优品 39 个。投放应先集中在这 42 个链接，避免把预算摊到 82 个普通品上。', 'w'],
+    ['4', '补齐欧美承接能力再放量', '欧美已是最大访客来源，但 5 分钟回复率仅 ' + pc(last.r5, 2) + '、平均回复约 ' + (last.replySec ? Math.round(last.replySec) + ' 秒' : '—') + '。回复慢会直接吃掉投放买来的商机。', 'w'],
+    ['5', '建立周度复盘看板', '每周固定对比：消耗、点击、商机成本、单链接花费产出、国家结构。当前周度消耗恒为 0，无法形成投放结论。', 'n']
+  ].map(([n, t, d, c]) => `<div style="display:flex;gap:11px;padding:9px 0;border-bottom:1px dashed rgba(36,57,90,.6)">
+      <span class="badge b-${c === 'r' ? 'bad' : c === 'w' ? 'warn' : 'idle'}" style="height:20px;flex:none">${n}</span>
+      <div><div style="font-weight:650;color:#e8eef8;font-size:12.5px">${t}</div>
+      <div style="font-size:11.8px;color:#8fa3bf;line-height:1.65">${d}</div></div></div>`).join('');
+
+  el('vs-rows').innerHTML = [
+    ['能看到的指标', '曝光量、点击率、花费、全站商机量、商机成本', '关键词曝光/点击/花费、词级询盘与商机成本、推广时长'],
+    ['关键词可控性', '不可见、不可调（AI 自动选词）', '可加词、调价、屏蔽，可看搜索词报告'],
+    ['转化归因颗粒度', '只到计划与商品，看不到词', '可到词，能回答"哪个词带来询盘"'],
+    ['人力投入', '省事，设置后基本不用管', '需要持续调词、调价、加屏蔽'],
+    ['适合阶段', '预算充足、要规模曝光、有稳定转化承接', '预算有限、要先验证词与人群'],
+    ['本店当前状态', '<span class="pill r">近90天花费 ¥0</span><span class="pill w">4 计划 / 3 暂停</span>', '<span class="pill r">近90天 0 行数据</span><span class="pill w">38 计划 / 4 在投</span>']
+  ].map(r => `<tr><td class="q">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('');
+}
+
+/* ================= 汇总 / 生命周期 ================= */
+function renderFoot() {
+  el('store-line').textContent = META.store + ' · Alibaba.com · 数据截至 ' + META.end;
+  el('foot').innerHTML = `
+    <div><b>数据来源：</b>店铺经营数据来自数据参谋本地库（store_overview / traffic_channels / product_performance / product_health_layers / buyer_distribution / store_period_summary）；
+    广告数据来自国际站广告接口（company_whole_site / company_search / campaign_search 报表 + 计划列表）。</div>
+    <div style="margin-top:6px"><b>区间权威口径（数据地图自定义日期原值，勿用日级反推）：</b>
+      访客 <code>${n0(PERIOD.visitors)}</code> · 询盘人数 <code>${n0(PERIOD.inquiryBuyers)}</code> · TM 咨询人数 <code>${n0(PERIOD.tmBuyers)}</code> ·
+      询盘数 <code>${n0(PERIOD.inquiries)}</code> · 商机量 <code>${n0(PERIOD.leads)}</code> · 订单 <code>${n0(PERIOD.orders)}</code> ·
+      ${PUBLIC ? 'GMV <code>已脱敏</code>' : 'GMV <code>$' + n2(PERIOD.gmv) + '</code>'} · 访客→商机 <code>${pc(PERIOD.v2l, 2)}</code> · 访客→订单 <code>${pc(PERIOD.v2o, 2)}</code>
+      （窗口 ${PERIOD.start} ~ ${PERIOD.endExclusive}，不含末日）</div>
+    <div style="margin-top:6px"><b>已知缺口：</b>① 广告消耗全区间为 ¥0，无法产出消耗/商机成本/国家消耗类结论；② 标准推近 90 天报表 0 行；
+      ③ 访客明细（visitor_detail）在 2026-08-12~2026-10-07 区间覆盖不可用，国家维度改用买家分布接口，只保留国家级聚合；
+      ④ 商品表为 ${META.snapshotDate} 单日快照，不构成跨期趋势；⑤ 及时回复率为当日值，非区间加权。</div>
+    <div style="margin-top:6px"><b>生成时间：</b>${META.generatedAt} · 只读数据，未对店铺或广告账户做任何写操作。</div>`;
+}
+
+/* ================= 交互 ================= */
+function syncInputs() {
+  el('d-start').value = S; el('d-end').value = E; el('d-one').value = (S === E ? S : '');
+  el('d-start').min = MIN_D; el('d-start').max = E;
+  el('d-end').min = S; el('d-end').max = MAX_D;
+  el('d-one').min = MIN_D; el('d-one').max = MAX_D;
+  el('range-chip').textContent = `${S} → ${E} · ${dayDiff(S, E)} 天`;
+  const isFull = S === MIN_D && E === MAX_D;
+  [...el('presets').children].forEach(b => b.classList.toggle('on', isFull && b.dataset.days === '0'));
+}
+
+function renderAll() {
+  if (PUBLIC && !document.getElementById('pub-banner')) {
+    const b = document.createElement('div');
+    b.id = 'pub-banner';
+    b.className = 'notice warn';
+    b.style.marginTop = '14px';
+    b.innerHTML = '<span class="ic">!</span><div><b>对外演示版 · 已脱敏</b>：'
+      + '已隐藏 GMV 金额、商品 ID、广告计划 ID。曝光 / 点击 / 访客 / 询盘 / 商机 / 订单 / 渠道结构等指标的相对关系保持真实，'
+      + '可直接用于演示"如何用数据判断投放好坏"的逻辑；具体金额与商品标识不在本页出现。</div>';
+    document.querySelector('.wrap').prepend(b);
+  }
+  syncInputs();
+  renderKPI(); drawTrend(); drawWeek();
+  renderP4P(); renderChannels(); renderProducts(); renderLayers(); renderCountry(); renderFramework(); renderFoot();
+}
+
+el('d-start').addEventListener('change', e => {
+  let v = e.target.value; if (!v) return;
+  if (v > E) { E = v; }
+  S = v; markPreset(); renderAll();
+});
+el('d-end').addEventListener('change', e => {
+  let v = e.target.value; if (!v) return;
+  if (v < S) { S = v; }
+  E = v; markPreset(); renderAll();
+});
+el('d-one').addEventListener('change', e => {
+  const v = e.target.value; if (!v) return;
+  S = v; E = v; markPreset(); renderAll();
+});
+el('presets').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const days = Number(b.dataset.days);
+  E = MAX_D; S = days === 0 ? MIN_D : addDays(MAX_D, -(days - 1));
+  if (S < MIN_D) S = MIN_D;
+  [...el('presets').children].forEach(x => x.classList.toggle('on', x === b));
+  renderAll();
+});
+function markPreset() { [...el('presets').children].forEach(x => x.classList.remove('on')); }
+el('pp-search').addEventListener('input', e => { ppQ = e.target.value.trim().toLowerCase(); renderProducts(); });
+el('pp-stage').addEventListener('change', e => { ppStage = e.target.value; renderProducts(); });
+el('pp-sort').addEventListener('change', e => { ppSort = e.target.value; renderProducts(); });
+document.querySelectorAll('thead th').forEach(th => th.addEventListener('click', () => {
+  if (!th.closest('#s-product')) return;
+  const map = { '搜索曝光': 'imp', '搜索点击': 'clk', '点击率': 'ctr', '访客': 'vis', '询盘': 'inq', '30天商机': 'leads', '订单': 'ords', 'GMV$': 'gmv', '直通车花费¥': 'p4pSpend' };
+  const k = map[th.textContent.trim()];
+  if (!k) return;
+  ppSort = k;
+  const sel = el('pp-sort');
+  sel.value = [...sel.options].some(o => o.value === k) ? k : 'imp';
+  renderProducts();
+}));
+
+renderAll();
+
+</script>
+</body>
+</html>
