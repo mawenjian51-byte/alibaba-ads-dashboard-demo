@@ -147,6 +147,46 @@ tbody tr:hover td{background:#f8fbff}
 .screen1 .hero{gap:14px}
 .screen1 .strip{margin-top:0}
 
+/* ---------- 首屏以下：整体缩小一档，横向重新排布 ---------- */
+.lower{margin-top:6px}
+.lower section{margin-top:26px}
+.lower .sec-h{margin-bottom:11px;gap:10px}
+.lower .sec-h h2{font-size:17px}
+.lower .sec-h .sub{font-size:12.5px}
+.lower .card{padding:17px 19px;border-radius:14px}
+.lower .card h3{font-size:12.5px;margin-bottom:11px}
+.lower .verdict{padding:15px 18px;border-radius:14px}
+.lower .verdict h4{font-size:15px;margin-bottom:4px}
+.lower .verdict p{font-size:12.8px;line-height:1.65}
+.lower .verdict .tagbig{font-size:11px;padding:4px 9px}
+.lower .stat3{gap:11px;margin-top:11px}
+.lower .stat3 .b{padding:14px 16px;border-radius:12px}
+.lower .stat3 .b .l{font-size:12px}
+.lower .stat3 .b .v{font-size:28px;letter-spacing:-1px;margin-top:2px}
+.lower .stat3 .b .s{font-size:11.5px}
+.lower .grid{gap:13px}
+.lower table{font-size:12.5px}
+.lower thead th{padding:9px 12px;font-size:11px}
+.lower tbody td{padding:9px 12px}
+.lower details{margin-top:11px;padding-top:10px}
+.lower details > summary{font-size:12.5px}
+.lower .legend{font-size:12px;margin-top:9px;gap:14px}
+.lower .hrow{grid-template-columns:96px 1fr 64px 52px;gap:9px;padding:7px 0;font-size:12.5px}
+.lower .hrow .val{font-size:13px}
+.lower .hrow .sub{font-size:11.5px}
+.lower .hrow .track,.lower .hrow .fill{height:8px}
+.lower .notice{padding:12px 15px;font-size:12.5px;line-height:1.65;border-radius:12px}
+.lower .toolbar{gap:8px;margin-bottom:12px}
+.lower .toolbar input[type=search],.lower .toolbar select{padding:8px 11px;font-size:12.5px;min-width:150px;border-radius:9px}
+.lower .pname{max-width:520px}
+.lower .pill{font-size:11px;padding:2px 8px}
+.lower .badge{font-size:10.5px;padding:2px 8px}
+.lower .fwi{padding:15px 17px;border-radius:13px}
+.lower .fwi .qt{font-size:13.5px;margin-bottom:8px}
+.lower .fwi .ln{font-size:12.5px;padding:5px 0}
+.lower .fwgrid{gap:12px}
+.lower .foot,.foot{font-size:12px}
+
 /* charts */
 svg{display:block;width:100%;height:auto;overflow:visible}
 .axis text{fill:#a3b1c6;font-size:11px}
@@ -294,6 +334,7 @@ details[open] > summary{margin-bottom:14px}
   </section>
   </div>
 
+  <div class="lower">
   <section id="s-p4p">
     <div class="sec-h">
       <h2>直通车投放状态</h2>
@@ -319,6 +360,7 @@ details[open] > summary{margin-bottom:14px}
     </div>
   </section>
 
+  <div class="grid g21" style="align-items:start">
   <section id="s-week">
     <div class="sec-h">
       <h2>按周消耗与转化</h2>
@@ -348,13 +390,9 @@ details[open] > summary{margin-bottom:14px}
       <span class="sub">搜索 / 推荐 / 榜单 / 店内 / 直接访问 / 站外 / 其他</span>
     </div>
     <div class="card">
-      <div class="grid g12" style="align-items:center">
-        <div>
-          <h3>渠道访客结构 <span class="tag">日累计</span></h3>
-          <div id="chart-pie" style="max-width:420px;margin:0 auto"></div>
-        </div>
-        <div id="ch-bars"></div>
-      </div>
+      <h3>渠道访客结构 <span class="tag">日累计</span></h3>
+      <div id="chart-pie" style="max-width:200px;margin:0 auto"></div>
+      <div id="ch-bars" style="margin-top:10px"></div>
       <details>
         <summary>展开渠道明细表</summary>
         <div class="tbl-wrap">
@@ -363,10 +401,11 @@ details[open] > summary{margin-bottom:14px}
         </div>
       </details>
       <div style="margin-top:14px;font-size:12.5px;color:var(--muted-2);line-height:1.7">
-        「其他」= 会场 / 信保 / 询盘 / 站内收藏 等上游次级渠道合并。渠道访客按各渠道分别计数，同一访客可能命中多个渠道，<b>合计可大于店铺访客数</b>。
+        「其他」= 会场 / 信保 / 询盘 / 站内收藏 等上游次级渠道合并。渠道访客按各渠道分别计数，        同一访客可能命中多个渠道，<b>合计可大于店铺访客数</b>。
       </div>
     </div>
   </section>
+  </div>
 
   <section id="s-product">
     <div class="sec-h">
@@ -391,7 +430,7 @@ details[open] > summary{margin-bottom:14px}
         </select>
         <span class="cnt" id="pp-cnt">—</span>
       </div>
-      <div class="tbl-wrap" style="max-height:600px">
+      <div class="tbl-wrap" style="max-height:392px">
         <table>
           <thead><tr>
             <th>商品</th><th>层级</th><th>搜索曝光</th><th>搜索点击</th><th>点击率</th><th>访客</th><th>询盘</th><th>30天商机</th><th>直通车花费¥</th>
@@ -457,6 +496,8 @@ details[open] > summary{margin-bottom:14px}
       </details>
     </div>
   </section>
+
+  </div><!-- /lower -->
 
   <div class="foot" id="foot"></div>
 </div>
@@ -664,7 +705,9 @@ function weekRows() {
 }
 function renderWeek() {
   const ws = weekRows();
-  const W = 1200, H = 340, pl = 52, pr = 20, pt = 20, pb = 44;
+  const host = el('chart-week');
+  const W = Math.max(420, Math.round(host.clientWidth || 880));
+  const H = 232, pl = 44, pr = 24, pt = 14, pb = 32;
   const iw = W - pl - pr, ih = H - pt - pb;
   const maxC = Math.max(1, ...ws.map(w => w.clk));
   const maxL = Math.max(1, ...ws.map(w => w.leads));
@@ -685,7 +728,7 @@ function renderWeek() {
       <text class="axis" x="${pl - 10}" y="${yy + 4}" text-anchor="end" fill="#a3b1c6">${Math.round(maxC / 3 * i)}</text>
       <text class="axis" x="${W - pr + 10}" y="${yy + 4}" fill="#86efac">${Math.round(maxL / 3 * i)}</text>`;
   }
-  el('chart-week').innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="height:340px">${grid}${bars}
+  el('chart-week').innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="height:${H}px">${grid}${bars}
     <line x1="${pl}" y1="${pt + ih}" x2="${W - pr}" y2="${pt + ih}" stroke="#e2e8f0"/></svg>`;
   el('week-rows').innerHTML = ws.map(w => `<tr>
     <td>${md(w.from)} ~ ${md(w.to)}</td><td class="mono">${n2(w.spend)}</td><td>${n0(w.exp)}</td>
@@ -724,8 +767,8 @@ function renderTraffic() {
   });
   el('chart-pie').innerHTML = `<svg viewBox="0 0 240 240" style="max-width:400px;margin:0 auto">
     ${arcs}
-    <text x="120" y="114" text-anchor="middle" fill="#0f172a" font-size="34" font-weight="780" letter-spacing="-1">${n0(total)}</text>
-    <text x="120" y="138" text-anchor="middle" fill="#94a3b8" font-size="12.5">渠道访客合计（日累计）</text></svg>`;
+    <text x="120" y="115" text-anchor="middle" fill="#0f172a" font-size="27" font-weight="780" letter-spacing="-.6">${n0(total)}</text>
+    <text x="120" y="136" text-anchor="middle" fill="#94a3b8" font-size="10.5">渠道访客合计（日累计）</text></svg>`;
   el('ch-bars').innerHTML = m.map(x => {
     const sub = Object.entries(x.raw).sort((a, b) => b[1] - a[1])
       .map(([k, v]) => `${k} ${n0(v)}`).join(' · ');
@@ -773,11 +816,11 @@ function renderLayers() {
   const pot = L.find(x => x.stage === '潜力优品') || { count: 0 };
   const rest = total - good.count - top.count - pot.count;
   el('layer-sub').textContent = `快照日 ${META.snapshotDate} · ${total} 个链接`;
-  el('layer-kpi').innerHTML = `<div class="grid" style="grid-template-columns:repeat(2,1fr);gap:12px">
-    ${[['优品', good.count, '#059669'], ['爆品', top.count, '#dc2626'], ['潜力优品', pot.count, '#d97706'], ['普通 + 低质', rest, '#64748b']]
-      .map(([l, c, col]) => `<div style="padding:16px 18px;border:1px solid var(--line);border-radius:14px">
-        <div style="font-size:12.5px;color:var(--muted)">${l}</div>
-        <div style="font-size:30px;font-weight:780;letter-spacing:-1px;color:${col}">${c}</div></div>`).join('')}
+  el('layer-kpi').innerHTML = `<div class="grid" style="grid-template-columns:repeat(4,1fr);gap:10px">
+    ${[['优品', good.count, '#059669'], ['爆品', top.count, '#dc2626'], ['潜力优品', pot.count, '#d97706'], ['普通+低质', rest, '#64748b']]
+      .map(([l, c, col]) => `<div style="padding:11px 13px;border:1px solid var(--line);border-radius:12px">
+        <div style="font-size:11.5px;color:var(--muted);white-space:nowrap">${l}</div>
+        <div style="font-size:25px;font-weight:780;letter-spacing:-1px;line-height:1.25;color:${col}">${c}</div></div>`).join('')}
   </div>`;
   const seg = L.map(x => {
     const w = x.count / total * 100;
@@ -946,7 +989,7 @@ requestAnimationFrame(() => requestAnimationFrame(drawTrend));
 let _rz;
 window.addEventListener('resize', () => {
   clearTimeout(_rz);
-  _rz = setTimeout(drawTrend, 160);
+  _rz = setTimeout(() => { drawTrend(); renderWeek(); }, 160);
 });
 
 </script>
